@@ -15,7 +15,9 @@
     "react": "17.0.2",
     "react-dom": "17.0.2",
     "react-native": "0.68.2",
-    "react-native-web": "0.17.7"
+    "react-native-web": "0.17.7",
+    "react-router": "^6.3.0",
+    "react-router-native": "^6.3.0"
   },
   "devDependencies": {
     "@babel/core": "^7.12.9"
