@@ -2,7 +2,7 @@ import { View, Button, Text, StyleSheet } from "react-native";
 import { useNavigate } from "react-router";
 import CustomInput from "../components/CustomInput";
 
-const NamePage = ({ playerNames, setNames }) => {
+const NamePage = ({ playerNames, setNames, setScores }) => {
 	let navigate = useNavigate();
 	return (
 		<View style={styles.container}>
@@ -18,8 +18,8 @@ const NamePage = ({ playerNames, setNames }) => {
 			))}
 			<Button
 				title="Continue"
-				color="gray"
-				disabled={playerNames.includes("")}
+				color="green"
+				disabled={playerNames.includes("") || new Set(playerNames).size !== playerNames.length}
 				onPress={() => {
 					navigate("/score");
 				}}

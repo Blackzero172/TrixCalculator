@@ -11,11 +11,12 @@ const CustomInput = ({ label, value, onChange }) => {
 const styles = StyleSheet.create({
 	input: {
 		borderWidth: 2,
+		borderColor: "#080",
 		padding: 10,
 		paddingRight: 60,
 		textAlign: "left",
 		borderRadius: 10,
-		backgroundColor: "#ccc5",
+		backgroundColor: "#0805",
 	},
 	inputContainer: {
 		margin: 20,

@@ -8,14 +8,14 @@ const HomePage = () => {
 			<Text style={styles.heading}>Trix Calculator</Text>
 			<Button
 				title="Start"
-				color="gray"
+				color="green"
 				onPress={() => {
 					navigate("/name");
 				}}
 			/>
 			<Button
 				title="Instructions"
-				color="gray"
+				color="green"
 				onPress={() => {
 					navigate("/instructions");
 				}}
