@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import { StyleSheet, Text, View, Dimensions, Button } from "react-native";
 import { useNavigate } from "react-router";
+import RoundCard from "../components/RoundCard";
 
 const screenWidth = Dimensions.get("window").width;
-const ScorePage = ({ playerNames, playerScores }) => {
+const ScorePage = ({ playerNames, playerScores, rounds }) => {
 	const navigate = useNavigate();
 	return (
 		<View>
@@ -14,6 +15,9 @@ const ScorePage = ({ playerNames, playerScores }) => {
 					</Text>
 				))}
 			</View>
+			{rounds.map((round) => (
+				<RoundCard round={round} />
+			))}
 			<View style={{ paddingHorizontal: 30, marginVertical: 30 }}>
 				<Button
 					color="green"

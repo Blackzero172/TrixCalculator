@@ -25,13 +25,12 @@ export default function App() {
 			obj[player] = 0;
 		});
 		rounds.forEach((round) => {
-			if (round.hasOwnProperty("trix")) {
-				const trix = round.trix;
-				for (let player in trix) {
-					obj[player] += trix[player].score;
+			if (round[Object.keys(round)[0]].hasOwnProperty("trix")) {
+				for (let player in round) {
+					obj[player] += round[player].trix.score;
 				}
 			}
-			if (round.hasOwnProperty("complex")) {
+			if (round[Object.keys(round)[0]].hasOwnProperty("complex")) {
 			}
 			setScores(obj);
 		});
@@ -65,7 +64,7 @@ export default function App() {
 					<Route
 						path="/score"
 						exact
-						element={<ScorePage playerNames={playerNames} playerScores={playerScores} />}
+						element={<ScorePage playerNames={playerNames} playerScores={playerScores} rounds={rounds} />}
 					/>
 				</Routes>
 				<StatusBar style="auto" />

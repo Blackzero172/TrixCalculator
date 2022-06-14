@@ -2,9 +2,11 @@ import { useState } from "react";
 import { Button, Dimensions, StyleSheet, Text, View } from "react-native";
 import { useNavigate } from "react-router";
 const screenWidth = Dimensions.get("window").width;
-const RoundPage = ({ roundPhase, setPhase, playerNames, playerScores, rounds, setRound, setScores }) => {
+const RoundPage = ({ roundPhase, setPhase, playerNames, playerScores, rounds, setRound }) => {
 	const navigate = useNavigate();
 	const [tempRound, setTempRound] = useState({});
+	const [selectedPlayer, setPlayer] = useState("");
+	const round = rounds[rounds.length - 1] ?? {};
 	return (
 		<View style={{ alignItems: "center" }}>
 			{!roundPhase && (
@@ -18,7 +20,7 @@ const RoundPage = ({ roundPhase, setPhase, playerNames, playerScores, rounds, se
 					/>
 					<Button
 						title="Complex"
-						color="green"
+						color="#d00"
 						onPress={() => {
 							setPhase("Complex");
 						}}
@@ -30,17 +32,18 @@ const RoundPage = ({ roundPhase, setPhase, playerNames, playerScores, rounds, se
 					<View style={styles.container}>
 						<Button
 							title="Reset"
-							color="red"
+							color="#d00"
 							onPress={() => {
 								setTempRound({});
 							}}
 							disabled={Object.keys(tempRound).length < 1}
 						/>
-						{!rounds.find((round) => Object.keys(round).length < 2) && (
+						{!rounds[Object.keys(round)[0]]?.hasOwnProperty("complex") && (
 							<Button
 								title="Back"
 								onPress={() => {
 									setPhase();
+									setTempRound({});
 								}}
 							/>
 						)}
@@ -53,12 +56,12 @@ const RoundPage = ({ roundPhase, setPhase, playerNames, playerScores, rounds, se
 								<View key={i} style={{ alignItems: "center" }}>
 									{hasPlacement && (
 										<Text>
-											{player.placement}
-											{player.placement === 1
+											{player.trix.placement}
+											{player.trix.placement === 1
 												? "st"
-												: player.placement === 2
+												: player.trix.placement === 2
 												? "nd"
-												: player.placement === 3
+												: player.trix.placement === 3
 												? "rd"
 												: "th"}
 										</Text>
@@ -71,8 +74,10 @@ const RoundPage = ({ roundPhase, setPhase, playerNames, playerScores, rounds, se
 												setTempRound({
 													...tempRound,
 													[name]: {
-														placement: Object.keys(tempRound).length + 1,
-														score: 200 - Object.keys(tempRound).length * 50 + playerScores[name],
+														trix: {
+															placement: Object.keys(tempRound).length + 1,
+															score: 200 - Object.keys(tempRound).length * 50 + playerScores[name],
+														},
 													},
 												});
 										}}
@@ -86,16 +91,25 @@ const RoundPage = ({ roundPhase, setPhase, playerNames, playerScores, rounds, se
 						title="Submit"
 						disabled={Object.keys(tempRound).length < 4}
 						onPress={() => {
-							setRound([...rounds, { trix: tempRound }]);
+							setRound([...rounds, tempRound]);
 							setTempRound({});
-							if (!rounds.find((round) => Object.keys(round).length < 2)) setPhase("Complex");
+
+							if (!rounds[Object.keys(round)[0]]?.hasOwnProperty("complex")) setPhase("Complex");
 							else setPhase();
 							navigate("/score");
 						}}
 					/>
 				</>
 			)}
-			{roundPhase === "Complex" && <></>}
+			{roundPhase === "Complex" && (
+				<>
+					<View style={styles.container}>
+						{playerNames.map((name, i) => {
+							return <Button title={name} color="green" onPress={() => {}} key={i} />;
+						})}
+					</View>
+				</>
+			)}
 		</View>
 	);
 };
