@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Button, Dimensions, StyleSheet, Text, View } from "react-native";
 import { useNavigate } from "react-router";
+import ComplexPage from "./ComplexPage";
 const screenWidth = Dimensions.get("window").width;
 const RoundPage = ({ roundPhase, setPhase, playerNames, playerScores, rounds, setRound }) => {
 	const navigate = useNavigate();
@@ -102,13 +103,13 @@ const RoundPage = ({ roundPhase, setPhase, playerNames, playerScores, rounds, se
 				</>
 			)}
 			{roundPhase === "Complex" && (
-				<>
-					<View style={styles.container}>
-						{playerNames.map((name, i) => {
-							return <Button title={name} color="green" onPress={() => {}} key={i} />;
-						})}
-					</View>
-				</>
+				<ComplexPage
+					playerNames={playerNames}
+					selectedPlayer={selectedPlayer}
+					setPlayer={setPlayer}
+					setTempRound={setTempRound}
+					tempRound={tempRound}
+				/>
 			)}
 		</View>
 	);

@@ -2,7 +2,7 @@ import { View, Button, Text, StyleSheet } from "react-native";
 import { useNavigate } from "react-router";
 import CustomInput from "../components/CustomInput";
 
-const NamePage = ({ playerNames, setNames, setScores }) => {
+const NamePage = ({ playerNames, setNames }) => {
 	let navigate = useNavigate();
 	return (
 		<View style={styles.container}>
@@ -13,6 +13,7 @@ const NamePage = ({ playerNames, setNames, setScores }) => {
 					onChange={(text) => {
 						setNames([...playerNames.slice(0, i), text, ...playerNames.slice(i + 1)]);
 					}}
+					placeholder="Enter Name..."
 					key={i}
 				/>
 			))}
