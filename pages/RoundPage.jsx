@@ -1,13 +1,24 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button, Dimensions, StyleSheet, Text, View } from "react-native";
 import { useNavigate } from "react-router";
 import ComplexPage from "./ComplexPage";
 const screenWidth = Dimensions.get("window").width;
+const initalState = { takes: 0, diamonds: 0, king: false, queens: 0 };
 const RoundPage = ({ roundPhase, setPhase, playerNames, playerScores, rounds, setRound }) => {
 	const navigate = useNavigate();
 	const [tempRound, setTempRound] = useState({});
 	const [selectedPlayer, setPlayer] = useState("");
+	const [currentCards, setCards] = useState(initalState);
 	const round = rounds[rounds.length - 1] ?? {};
+	useEffect(() => {
+		const cards = initalState;
+		for (let player in tempRound) {
+			cards.takes += +tempRound[selectedPlayer]?.complex.takes ?? 0;
+			cards.diamonds += +tempRound[selectedPlayer]?.complex.takes ?? 0;
+			cards.queens += +tempRound[selectedPlayer]?.complex.takes ?? 0;
+			cards.king += +tempRound[selectedPlayer]?.complex.takes ?? 0;
+		}
+	}, [tempRound]);
 	return (
 		<View style={{ alignItems: "center" }}>
 			{!roundPhase && (
@@ -46,6 +57,7 @@ const RoundPage = ({ roundPhase, setPhase, playerNames, playerScores, rounds, se
 									setPhase();
 									setTempRound({});
 								}}
+								color="#d00"
 							/>
 						)}
 					</View>
@@ -109,6 +121,7 @@ const RoundPage = ({ roundPhase, setPhase, playerNames, playerScores, rounds, se
 					setPlayer={setPlayer}
 					setTempRound={setTempRound}
 					tempRound={tempRound}
+					currentCards={currentCards}
 				/>
 			)}
 		</View>
