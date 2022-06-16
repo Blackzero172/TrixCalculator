@@ -1,11 +1,11 @@
 import { Dimensions, View } from "react-native";
 import PlayerScoreCard from "./PlayerScoreCard";
 
-const RoundCard = ({ round }) => {
+const RoundCard = ({ round, playerNames }) => {
 	const screenWidth = Dimensions.get("window").width;
 	return (
 		<View style={{ flexDirection: "row", width: screenWidth, justifyContent: "space-evenly" }}>
-			{Object.keys(round).map((player) => (
+			{playerNames.map((player) => (
 				<PlayerScoreCard player={round[player]} />
 			))}
 		</View>

@@ -1,24 +1,26 @@
 import { useEffect, useState } from "react";
 import { Button, Dimensions, StyleSheet, Text, View } from "react-native";
 import { useNavigate } from "react-router";
+import { connect } from "react-redux";
 import ComplexPage from "./ComplexPage";
+import {
+	setRoundPhase,
+	setRounds,
+	selectPlayer,
+	setCurrentCards,
+	setCurrentRound,
+} from "../actions/actionCreators";
 const screenWidth = Dimensions.get("window").width;
-const initalState = { takes: 0, diamonds: 0, king: false, queens: 0 };
-const RoundPage = ({ roundPhase, setPhase, playerNames, playerScores, rounds, setRound }) => {
+const RoundPage = ({
+	roundPhase,
+	setRoundPhase,
+	playerNames,
+	rounds,
+	setRounds,
+	currentRound,
+	setCurrentRound,
+}) => {
 	const navigate = useNavigate();
-	const [tempRound, setTempRound] = useState({});
-	const [selectedPlayer, setPlayer] = useState("");
-	const [currentCards, setCards] = useState(initalState);
-	const round = rounds[rounds.length - 1] ?? {};
-	useEffect(() => {
-		const cards = initalState;
-		for (let player in tempRound) {
-			cards.takes += +tempRound[selectedPlayer]?.complex.takes ?? 0;
-			cards.diamonds += +tempRound[selectedPlayer]?.complex.takes ?? 0;
-			cards.queens += +tempRound[selectedPlayer]?.complex.takes ?? 0;
-			cards.king += +tempRound[selectedPlayer]?.complex.takes ?? 0;
-		}
-	}, [tempRound]);
 	return (
 		<View style={{ alignItems: "center" }}>
 			{!roundPhase && (
@@ -27,14 +29,14 @@ const RoundPage = ({ roundPhase, setPhase, playerNames, playerScores, rounds, se
 						title="Trix"
 						color="green"
 						onPress={() => {
-							setPhase("Trix");
+							setRoundPhase("Trix");
 						}}
 					/>
 					<Button
 						title="Complex"
 						color="#d00"
 						onPress={() => {
-							setPhase("Complex");
+							setRoundPhase("Complex");
 						}}
 					/>
 				</View>
@@ -46,16 +48,16 @@ const RoundPage = ({ roundPhase, setPhase, playerNames, playerScores, rounds, se
 							title="Reset"
 							color="#d00"
 							onPress={() => {
-								setTempRound({});
+								setCurrentRound({});
 							}}
-							disabled={Object.keys(tempRound).length < 1}
+							disabled={Object.keys(currentRound).length < 1}
 						/>
-						{!rounds[Object.keys(round)[0]]?.hasOwnProperty("complex") && (
+						{!rounds[Object.keys(currentRound)[0]]?.hasOwnProperty("complex") && (
 							<Button
 								title="Back"
 								onPress={() => {
-									setPhase();
-									setTempRound({});
+									setRoundPhase();
+									setCurrentRound({});
 								}}
 								color="#d00"
 							/>
@@ -63,8 +65,8 @@ const RoundPage = ({ roundPhase, setPhase, playerNames, playerScores, rounds, se
 					</View>
 					<View style={[styles.container, { marginVertical: 50 }]}>
 						{playerNames.map((name, i) => {
-							const player = tempRound[name];
-							const hasPlacement = Object.keys(tempRound).includes(name);
+							const player = currentRound[name];
+							const hasPlacement = Object.keys(currentRound).includes(name);
 							return (
 								<View key={i} style={{ alignItems: "center" }}>
 									{hasPlacement && (
@@ -84,12 +86,12 @@ const RoundPage = ({ roundPhase, setPhase, playerNames, playerScores, rounds, se
 										color="green"
 										onPress={() => {
 											if (!hasPlacement)
-												setTempRound({
-													...tempRound,
+												setCurrentRound({
+													...currentRound,
 													[name]: {
 														trix: {
-															placement: Object.keys(tempRound).length + 1,
-															score: 200 - Object.keys(tempRound).length * 50 + playerScores[name],
+															placement: Object.keys(currentRound).length + 1,
+															score: 200 - Object.keys(currentRound).length * 50,
 														},
 													},
 												});
@@ -102,28 +104,19 @@ const RoundPage = ({ roundPhase, setPhase, playerNames, playerScores, rounds, se
 					</View>
 					<Button
 						title="Submit"
-						disabled={Object.keys(tempRound).length < 4}
+						disabled={Object.keys(currentRound).length < 4}
 						onPress={() => {
-							setRound([...rounds, tempRound]);
-							setTempRound({});
+							setRounds([...rounds, currentRound]);
+							setCurrentRound({});
 
-							if (!rounds[Object.keys(round)[0]]?.hasOwnProperty("complex")) setPhase("Complex");
-							else setPhase();
+							if (!rounds[Object.keys(currentRound)[0]]?.hasOwnProperty("complex")) setRoundPhase("Complex");
+							else setRoundPhase(null);
 							navigate("/score");
 						}}
 					/>
 				</>
 			)}
-			{roundPhase === "Complex" && (
-				<ComplexPage
-					playerNames={playerNames}
-					selectedPlayer={selectedPlayer}
-					setPlayer={setPlayer}
-					setTempRound={setTempRound}
-					tempRound={tempRound}
-					currentCards={currentCards}
-				/>
-			)}
+			{roundPhase === "Complex" && <ComplexPage />}
 		</View>
 	);
 };
@@ -134,4 +127,18 @@ const styles = StyleSheet.create({
 		width: screenWidth,
 	},
 });
-export default RoundPage;
+const mapStateToProps = (state) => {
+	return {
+		playerNames: state.playerNames,
+		roundPhase: state.roundPhase,
+		rounds: state.rounds,
+		currentRound: state.currentRound,
+	};
+};
+export default connect(mapStateToProps, {
+	setRoundPhase,
+	setRounds,
+	selectPlayer,
+	setCurrentCards,
+	setCurrentRound,
+})(RoundPage);

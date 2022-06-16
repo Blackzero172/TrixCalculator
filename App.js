@@ -1,75 +1,36 @@
 import { StatusBar } from "expo-status-bar";
 import { useEffect, useState } from "react";
-import { StyleSheet, View, SafeAreaView, Text, Button } from "react-native";
+import { StyleSheet, SafeAreaView } from "react-native";
 import { NativeRouter, Route, Routes } from "react-router-native";
-import NamePage from "./pages/NamePage";
-import ScorePage from "./pages/ScorePage";
-import HomePage from "./pages/HomePage";
-import InstructionsPage from "./pages/InstructionsPage";
-import RoundPage from "./pages/RoundPage";
+import { Provider } from "react-redux";
+import { createStore } from "redux";
+
+import NamePage from "./src/pages/NamePage";
+import ScorePage from "./src/pages/ScorePage";
+import HomePage from "./src/pages/HomePage";
+import InstructionsPage from "./src/pages/InstructionsPage";
+import RoundPage from "./src/pages/RoundPage";
+import reducers from "./src/reducers/reducers";
+import { devToolsEnhancer } from "redux-devtools-extension";
+
+const store = createStore(reducers, devToolsEnhancer());
+
 export default function App() {
-	const [playerNames, setNames] = useState(["Ali", "Ahmad", "Saed", "Ibrahem"]);
-	const [playerScores, setScores] = useState({});
-	const [rounds, setRound] = useState([]);
-	const [roundPhase, setPhase] = useState();
-	useEffect(() => {
-		const obj = {};
-		playerNames.forEach((player) => {
-			obj[player] = 0;
-		});
-		setScores(obj);
-	}, [playerNames]);
-	useEffect(() => {
-		const obj = {};
-		playerNames.forEach((player) => {
-			obj[player] = 0;
-		});
-		rounds.forEach((round) => {
-			if (round[Object.keys(round)[0]].hasOwnProperty("trix")) {
-				for (let player in round) {
-					obj[player] += round[player].trix.score;
-				}
-			}
-			if (round[Object.keys(round)[0]].hasOwnProperty("complex")) {
-			}
-			setScores(obj);
-		});
-	}, [rounds]);
 	return (
-		<SafeAreaView style={styles.container}>
-			<NativeRouter>
-				<Routes>
-					<Route path="/" exact element={<HomePage />} />
-					<Route path="/instructions" exact element={<InstructionsPage />} />
-					<Route
-						path="/new"
-						exact
-						element={
-							<RoundPage
-								roundPhase={roundPhase}
-								setPhase={setPhase}
-								playerNames={playerNames}
-								playerScores={playerScores}
-								rounds={rounds}
-								setRound={setRound}
-								setScores={setScores}
-							/>
-						}
-					/>
-					<Route
-						path="/name"
-						exact
-						element={<NamePage playerNames={playerNames} setNames={setNames} setScores={setScores} />}
-					/>
-					<Route
-						path="/score"
-						exact
-						element={<ScorePage playerNames={playerNames} playerScores={playerScores} rounds={rounds} />}
-					/>
-				</Routes>
-				<StatusBar style="auto" />
-			</NativeRouter>
-		</SafeAreaView>
+		<Provider store={store}>
+			<SafeAreaView style={styles.container}>
+				<NativeRouter>
+					<Routes>
+						<Route path="/" exact element={<HomePage />} />
+						<Route path="/instructions" exact element={<InstructionsPage />} />
+						<Route path="/new" exact element={<RoundPage />} />
+						<Route path="/name" exact element={<NamePage />} />
+						<Route path="/score" exact element={<ScorePage />} />
+					</Routes>
+					<StatusBar style="auto" />
+				</NativeRouter>
+			</SafeAreaView>
+		</Provider>
 	);
 }
 

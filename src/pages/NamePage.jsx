@@ -1,6 +1,9 @@
-import { View, Button, Text, StyleSheet } from "react-native";
+import { View, Button, StyleSheet } from "react-native";
 import { useNavigate } from "react-router";
+import { connect } from "react-redux";
+
 import CustomInput from "../components/CustomInput";
+import { setNames } from "../actions/actionCreators";
 
 const NamePage = ({ playerNames, setNames }) => {
 	let navigate = useNavigate();
@@ -33,4 +36,9 @@ const styles = StyleSheet.create({
 		alignItems: "center",
 	},
 });
-export default NamePage;
+const mapStateToProps = (state) => {
+	return {
+		playerNames: state.playerNames,
+	};
+};
+export default connect(mapStateToProps, { setNames })(NamePage);
