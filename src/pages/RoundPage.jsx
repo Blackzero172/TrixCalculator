@@ -56,7 +56,7 @@ const RoundPage = ({
 							<Button
 								title="Back"
 								onPress={() => {
-									setRoundPhase();
+									setRoundPhase(null);
 									setCurrentRound({});
 								}}
 								color="#d00"

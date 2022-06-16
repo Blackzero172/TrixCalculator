@@ -26,6 +26,9 @@ const ScorePage = ({ playerNames, playerScores, rounds, setScores }) => {
 				}
 			}
 			if (round[Object.keys(round)[0]].hasOwnProperty("complex")) {
+				for (let player in round) {
+					obj[player] -= round[player].complex.score;
+				}
 			}
 			setScores(obj);
 		});
