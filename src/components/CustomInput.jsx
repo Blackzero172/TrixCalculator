@@ -1,6 +1,6 @@
-import { StyleSheet, View, Text, TextInput } from "react-native";
+import { StyleSheet, View, Text, TextInput, Image } from "react-native";
 
-const CustomInput = ({ label, value, onChange, placeholder, type, color }) => {
+const CustomInput = ({ label, value, onChange, placeholder, type, color, hasIcon }) => {
 	const styles = StyleSheet.create({
 		input: {
 			borderWidth: 2,
@@ -21,7 +21,14 @@ const CustomInput = ({ label, value, onChange, placeholder, type, color }) => {
 	});
 	return (
 		<View style={styles.inputContainer}>
-			{label && <Text style={styles.label}>{label}</Text>}
+			{label && (
+				<Text style={styles.label}>
+					{hasIcon && (
+						<Image source={require("../../assets/Diamond_Suit.png")} style={{ width: 30, height: 30 }} />
+					)}
+					{label}
+				</Text>
+			)}
 			<TextInput
 				style={styles.input}
 				placeholder={placeholder}

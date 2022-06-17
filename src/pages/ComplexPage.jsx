@@ -1,6 +1,6 @@
-import { Alert, Button, Dimensions, StyleSheet, Text, View } from "react-native";
-import CustomCheckbox from "../components/CustomCheckbox";
+import { Alert, Button, Dimensions, StyleSheet, Text, View, Image, TouchableHighlight } from "react-native";
 import CustomInput from "../components/CustomInput";
+import Popup from "../components/Popup";
 import {
 	selectPlayer,
 	setCurrentRound,
@@ -12,6 +12,7 @@ import {
 import { connect } from "react-redux";
 import { useEffect } from "react";
 import { useNavigate } from "react-router";
+import { useState } from "react";
 const initalState = { takes: 0, king: false, kingDouble: false, diamonds: 0, queens: 0, queenDouble: 0 };
 
 const screenWidth = Dimensions.get("window").width;
@@ -30,6 +31,7 @@ const ComplexPage = ({
 	rounds,
 }) => {
 	const navigate = useNavigate();
+	const [popupOpen, setPopup] = useState(false);
 	useEffect(() => {
 		const resetComplex = () => {
 			if (!rounds[Object.keys(currentRound)[0]]?.hasOwnProperty("trix")) setRoundPhase("Trix");
@@ -166,48 +168,26 @@ const ComplexPage = ({
 							}
 						}}
 						type="number-pad"
+						hasIcon
 					/>
-					<View style={{ flexDirection: "row" }}>
-						<CustomInput
-							label="Queens"
-							value={currentCards.queens}
-							onChange={(text) => {
-								setCurrentCards({ ...currentCards, queens: +text + maxCards.queens > 4 ? "4" : text });
-							}}
-							type="numeric"
-						/>
-						<CustomInput
-							label="Double Queens"
-							value={currentCards.queens}
-							onChange={(text) => {
-								setCurrentCards({ ...currentCards, queens: +text + maxCards.queens > 4 ? "4" : text });
-							}}
-							type="numeric"
-							color="fd7"
-						/>
+					<View style={styles.cardsContainer}>
+						<TouchableHighlight style={styles.cardBtn}>
+							<Image source={require("../../assets/King_of_Hearts.png")} style={styles.card} />
+						</TouchableHighlight>
+						<TouchableHighlight style={styles.cardBtn}>
+							<Image source={require("../../assets/Queen_of_Hearts.png")} style={styles.card} />
+						</TouchableHighlight>
+						<TouchableHighlight style={styles.cardBtn}>
+							<Image source={require("../../assets/Queen_of_Diamonds.png")} style={styles.card} />
+						</TouchableHighlight>
+						<TouchableHighlight style={styles.cardBtn}>
+							<Image source={require("../../assets/Queen_of_Spades.png")} style={styles.card} />
+						</TouchableHighlight>
+						<TouchableHighlight style={styles.cardBtn}>
+							<Image source={require("../../assets/Queen_of_Clubs.png")} style={styles.card} />
+						</TouchableHighlight>
 					</View>
-					<View style={{ flexDirection: "row" }}>
-						<CustomCheckbox
-							label="King"
-							color="green"
-							checked={currentCards.king}
-							onChange={() => {
-								setCurrentCards({ ...currentCards, king: !currentCards.king });
-							}}
-						/>
-						<CustomCheckbox
-							label="Double Points"
-							color="#fd7"
-							checked={currentCards.kingDouble}
-							onChange={() => {
-								setCurrentCards({
-									...currentCards,
-									kingDouble: !currentCards.kingDouble,
-									king: !currentCards.kingDouble,
-								});
-							}}
-						/>
-					</View>
+
 					<View style={{ marginTop: 20 }}>
 						<Button
 							title="Confirm"
@@ -270,6 +250,13 @@ const ComplexPage = ({
 						/>
 					))}
 			</View>
+			<Popup
+				visible={popupOpen}
+				buttons={[
+					{ text: "Normal", onPress: () => {}, color: "green" },
+					{ text: "Double", onPress: () => {}, color: "gold" },
+				]}
+			></Popup>
 		</View>
 	);
 };
@@ -278,6 +265,22 @@ const styles = StyleSheet.create({
 		flexDirection: "row",
 		justifyContent: "space-evenly",
 		width: screenWidth,
+	},
+	cardsContainer: {
+		flexDirection: "row",
+		marginVertical: 10,
+	},
+	card: {
+		width: 60,
+		height: 90,
+	},
+
+	cardBtn: {
+		marginHorizontal: 6,
+		borderWidth: 3,
+		borderRadius: 8,
+		overflow: "hidden",
+		borderColor: "green",
 	},
 });
 const mapStateToProps = (state) => {
