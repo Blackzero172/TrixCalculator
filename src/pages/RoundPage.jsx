@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import { Button, Dimensions, StyleSheet, Text, View } from "react-native";
 import { useNavigate } from "react-router";
 import { connect } from "react-redux";
@@ -21,25 +20,41 @@ const RoundPage = ({
 	setCurrentRound,
 }) => {
 	const navigate = useNavigate();
+	let lastRound = rounds[rounds.length - 1] || {};
+	let lastRoundPlayer = lastRound[Object.keys(lastRound)[0]] || {};
+	const newRoundCondition =
+		!lastRoundPlayer.hasOwnProperty("complex") ||
+		(lastRoundPlayer.hasOwnProperty("complex") && lastRoundPlayer.hasOwnProperty("trix"));
 	return (
 		<View style={{ alignItems: "center" }}>
 			{!roundPhase && (
-				<View style={styles.container}>
-					<Button
-						title="Trix"
-						color="green"
-						onPress={() => {
-							setRoundPhase("Trix");
-						}}
-					/>
-					<Button
-						title="Complex"
-						color="#d00"
-						onPress={() => {
-							setRoundPhase("Complex");
-						}}
-					/>
-				</View>
+				<>
+					<View style={styles.container}>
+						<Button
+							title="Trix"
+							color="green"
+							onPress={() => {
+								setRoundPhase("Trix");
+							}}
+						/>
+						<Button
+							title="Complex"
+							color="green"
+							onPress={() => {
+								setRoundPhase("Complex");
+							}}
+						/>
+					</View>
+					<View style={{ marginTop: 20 }}>
+						<Button
+							title="Back"
+							color="#d00"
+							onPress={() => {
+								navigate("/score");
+							}}
+						/>
+					</View>
+				</>
 			)}
 			{roundPhase === "Trix" && (
 				<>
@@ -52,7 +67,7 @@ const RoundPage = ({
 							}}
 							disabled={Object.keys(currentRound).length < 1}
 						/>
-						{!rounds[Object.keys(currentRound)[0]]?.hasOwnProperty("complex") && (
+						{newRoundCondition && (
 							<Button
 								title="Back"
 								onPress={() => {
@@ -106,10 +121,16 @@ const RoundPage = ({
 						title="Submit"
 						disabled={Object.keys(currentRound).length < 4}
 						onPress={() => {
-							setRounds([...rounds, currentRound]);
+							if (newRoundCondition) setRounds([...rounds, currentRound]);
+							else {
+								playerNames.forEach((player) => {
+									lastRound[player] = { ...currentRound[player], ...lastRound[player] };
+								});
+								setRounds([...rounds.slice(0, rounds.length - 1), lastRound]);
+							}
 							setCurrentRound({});
 
-							if (!rounds[Object.keys(currentRound)[0]]?.hasOwnProperty("complex")) setRoundPhase("Complex");
+							if (newRoundCondition) setRoundPhase("Complex");
 							else setRoundPhase(null);
 							navigate("/score");
 						}}

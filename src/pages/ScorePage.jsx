@@ -27,7 +27,7 @@ const ScorePage = ({ playerNames, playerScores, rounds, setScores }) => {
 			}
 			if (round[Object.keys(round)[0]].hasOwnProperty("complex")) {
 				for (let player in round) {
-					obj[player] -= round[player].complex.score;
+					obj[player] += round[player].complex.score;
 				}
 			}
 			setScores(obj);
@@ -64,7 +64,14 @@ const ScorePage = ({ playerNames, playerScores, rounds, setScores }) => {
 				]}
 			>
 				{playerNames.map((name, i) => (
-					<Text style={styles.text} key={i * 2}>
+					<Text
+						style={[
+							styles.text,
+							{ color: playerScores[name] > 0 ? "green" : playerNames[name] < 0 ? "#d00" : "black" },
+						]}
+						key={i * 2}
+					>
+						{playerScores[name] > 0 ? "+" : playerNames[name] < 0 ? "-" : ""}
 						{playerScores[name]}
 					</Text>
 				))}
@@ -79,7 +86,6 @@ const styles = StyleSheet.create({
 		width: screenWidth,
 	},
 	text: {
-		// borderWidth: 1,
 		flex: 1,
 		textAlign: "center",
 	},

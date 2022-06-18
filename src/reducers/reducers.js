@@ -12,7 +12,6 @@ const selectedPlayerReducer = (selectedPlayer = "", action) => {
 	return selectedPlayer;
 };
 const roundsReducer = (rounds = [], action) => {
-	console.log(action.type);
 	if (action.type === "ADD_ROUND") return action.payload;
 	return rounds;
 };
@@ -24,12 +23,33 @@ const roundPhaseReducer = (roundPhase = null, action) => {
 	if (action.type === "CHANGE_PHASE") return action.payload;
 	return roundPhase;
 };
-const maxCardsReducer = (maxCards = { takes: 0, king: false, diamonds: 0, queens: 0 }, action) => {
+const maxCardsReducer = (
+	maxCards = (initalState = {
+		takes: 0,
+		king: false,
+		diamonds: 0,
+		qDiamonds: false,
+		qHearts: false,
+		qSpades: false,
+		qClubs: false,
+	}),
+	action
+) => {
 	if (action.type === "ADD_MAX_CARDS") return action.payload;
 	return maxCards;
 };
 const currentCardsReducer = (
-	currentCards = { takes: 0, king: false, kingDouble: false, diamonds: 0, queens: 0, queenDouble: 0 },
+	currentCards = (initalState = {
+		takes: 0,
+		king: false,
+		kingDouble: false,
+		diamonds: 0,
+		qDiamonds: false,
+		qHearts: false,
+		qSpades: false,
+		qClubs: false,
+		queenDouble: 0,
+	}),
 	action
 ) => {
 	if (action.type === "ADD_CURRENT_CARDS") return action.payload;

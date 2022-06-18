@@ -48,6 +48,7 @@ const styles = StyleSheet.create({
 	header: {
 		width: "100%",
 		alignItems: "flex-end",
+		marginBottom: 20,
 	},
 	buttonContainer: {
 		width: "100%",

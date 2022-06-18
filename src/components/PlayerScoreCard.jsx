@@ -1,7 +1,7 @@
 import { StyleSheet, Text, View } from "react-native";
 
 const PlayerScoreCard = ({ player }) => {
-	const total = player.trix?.score || 0 - player.complex?.score || 0;
+	const total = (player.trix?.score || 0) + (player.complex?.score || 0);
 	return (
 		<View style={{ alignItems: "center", flex: 1 }}>
 			<View style={{ flexDirection: "row", borderBottomWidth: 1 }}>
@@ -10,12 +10,20 @@ const PlayerScoreCard = ({ player }) => {
 			</View>
 			<View style={styles.textContainer}>
 				{player.hasOwnProperty("trix") ? (
-					<Text style={styles.trixText}>{player.trix.score}</Text>
+					<Text style={styles.trixText}>+{player.trix.score}</Text>
 				) : (
-					<Text>---</Text>
+					<Text style={styles.trixText}>---</Text>
 				)}
-				{player.hasOwnProperty("trix") ? (
-					<Text style={{ padding: 3, color: "#d00" }}>{player.complex.score}</Text>
+				{player.hasOwnProperty("complex") ? (
+					<Text
+						style={{
+							padding: 3,
+							color: player.complex.score > 0 ? "green" : player.complex.score < 0 ? "#d00" : "black",
+						}}
+					>
+						{player.complex.score > 0 ? "+" : ""}
+						{player.complex.score}
+					</Text>
 				) : (
 					<Text>---</Text>
 				)}
