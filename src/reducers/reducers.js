@@ -48,7 +48,10 @@ const currentCardsReducer = (
 		qHearts: false,
 		qSpades: false,
 		qClubs: false,
-		queenDouble: 0,
+		qDiamondsDouble: false,
+		qHeartsDouble: false,
+		qSpadesDouble: false,
+		qClubsDouble: false,
 	}),
 	action
 ) => {

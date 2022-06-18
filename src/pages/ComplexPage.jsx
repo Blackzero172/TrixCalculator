@@ -22,9 +22,21 @@ const initalState = {
 	qHearts: false,
 	qSpades: false,
 	qClubs: false,
-	queenDouble: 0,
+	qDiamondsDouble: false,
+	qHeartsDouble: false,
+	qSpadesDouble: false,
+	qClubsDouble: false,
 };
 
+const maxInitalState = {
+	takes: 0,
+	king: false,
+	diamonds: 0,
+	qDiamonds: false,
+	qHearts: false,
+	qSpades: false,
+	qClubs: false,
+};
 const screenWidth = Dimensions.get("window").width;
 const ComplexPage = ({
 	playerNames,
@@ -46,6 +58,13 @@ const ComplexPage = ({
 	const [rewardArray, setReward] = useState({});
 	let lastRound = rounds[rounds.length - 1] || {};
 	let lastRoundPlayer = lastRound[Object.keys(lastRound)[0]] || {};
+	let specialCardsCondition =
+		maxCards.king &&
+		maxCards.qClubs &&
+		maxCards.qDiamonds &&
+		maxCards.qHearts &&
+		maxCards.qSpades &&
+		maxCards.diamonds >= 13;
 	const newRoundCondition =
 		!lastRoundPlayer.hasOwnProperty("trix") ||
 		(lastRoundPlayer.hasOwnProperty("complex") && lastRoundPlayer.hasOwnProperty("trix"));
@@ -54,11 +73,12 @@ const ComplexPage = ({
 			if (!lastRoundPlayer.hasOwnProperty("trix")) setRoundPhase("Trix");
 			else setRoundPhase(null);
 			setCurrentRound({});
-			setMaxCards(initalState);
+			setMaxCards(maxInitalState);
 		};
 		if (maxCards.takes >= 13) {
 			let currentRoundCopy = { ...currentRound };
 			playerNames.forEach((player) => {
+				console.log(!currentRound[player]?.hasOwnProperty("complex"));
 				if (!currentRound[player]?.hasOwnProperty("complex"))
 					currentRoundCopy = {
 						...currentRoundCopy,
@@ -82,14 +102,14 @@ const ComplexPage = ({
 			if (newRoundCondition) setRounds([...rounds, currentRoundCopy]);
 			else {
 				playerNames.forEach((player) => {
-					lastRound[player] = { ...currentRoundCopy[player], ...lastRound[player] };
+					lastRound[player] = { ...lastRound[player], ...currentRoundCopy[player] };
 				});
 				setRounds([...rounds.slice(0, rounds.length - 1), lastRound]);
 			}
 			resetComplex();
 			navigate("/score");
 		}
-	}, [maxCards]);
+	}, [maxCards, currentRound]);
 	return (
 		<View style={{ alignItems: "center" }}>
 			{selectedPlayer === "" ? (
@@ -114,6 +134,8 @@ const ComplexPage = ({
 								color="#d00"
 								onPress={() => {
 									setRoundPhase(null);
+									setCurrentRound({});
+									setMaxCards(maxInitalState);
 								}}
 							/>
 						)}
@@ -166,9 +188,14 @@ const ComplexPage = ({
 														...currentRound,
 														[selectedPlayer]: {
 															...currentRound[selectedPlayer],
-															complex: {
-																takes: currentCards.takes,
-															},
+															complex: !specialCardsCondition
+																? {
+																		takes: currentCards.takes,
+																  }
+																: {
+																		...initalState,
+																		takes: currentCards.takes,
+																  },
 														},
 													});
 												},
@@ -183,11 +210,17 @@ const ComplexPage = ({
 										...currentRound,
 										[selectedPlayer]: {
 											...currentRound[selectedPlayer],
-											complex: {
-												takes: currentCards.takes,
-											},
+											complex: !specialCardsCondition
+												? {
+														takes: currentCards.takes,
+												  }
+												: {
+														...initalState,
+														takes: currentCards.takes,
+												  },
 										},
 									});
+								if (specialCardsCondition) selectPlayer("");
 							}
 						}}
 					/>
@@ -211,7 +244,7 @@ const ComplexPage = ({
 							{
 								setCurrentCards({
 									...currentCards,
-									diamonds: +text + maxCards.diamonds > 13 ? "13" : text,
+									diamonds: +text + maxCards.diamonds > 13 ? (13 - maxCards.diamonds).toString() : text,
 								});
 							}
 						}}
@@ -227,7 +260,7 @@ const ComplexPage = ({
 										currentCards.king && !currentCards.kingDouble
 											? "#0f05"
 											: currentCards.kingDouble
-											? "#fd7a"
+											? "#fd7e"
 											: "transparent",
 								},
 							]}
@@ -256,17 +289,153 @@ const ComplexPage = ({
 								<Image source={require("../../assets/King_of_Hearts.png")} style={styles.card} />
 							</>
 						</TouchableHighlight>
-						<TouchableHighlight style={styles.cardBtn}>
-							<Image source={require("../../assets/Queen_of_Hearts.png")} style={styles.card} />
+						<TouchableHighlight
+							style={[
+								styles.cardBtn,
+								{
+									backgroundColor:
+										currentCards.qHearts && !currentCards.qHeartsDouble
+											? "#0f05"
+											: currentCards.qHeartsDouble
+											? "#fd7e"
+											: "transparent",
+								},
+							]}
+							onPress={() => {
+								setCurrentCards({ ...currentCards, qHearts: false, qHeartsDouble: false });
+								setCard("qHearts");
+								setPopup(true);
+							}}
+							underlayColor="#0805"
+							disabled={maxCards.qHearts}
+						>
+							<>
+								{maxCards.qHearts && (
+									<View
+										style={{
+											width: "100%",
+											height: "100%",
+											backgroundColor: "#0008",
+											zIndex: 2,
+											position: "absolute",
+											top: 0,
+											left: 0,
+										}}
+									></View>
+								)}
+								<Image source={require("../../assets/Queen_of_Hearts.png")} style={styles.card} />
+							</>
 						</TouchableHighlight>
-						<TouchableHighlight style={styles.cardBtn}>
-							<Image source={require("../../assets/Queen_of_Diamonds.png")} style={styles.card} />
+						<TouchableHighlight
+							style={[
+								styles.cardBtn,
+								{
+									backgroundColor:
+										currentCards.qDiamonds && !currentCards.qDiamondsDouble
+											? "#0f05"
+											: currentCards.qDiamondsDouble
+											? "#fd7e"
+											: "transparent",
+								},
+							]}
+							onPress={() => {
+								setCurrentCards({ ...currentCards, qDiamonds: false, qDiamondsDouble: false });
+								setCard("qDiamonds");
+								setPopup(true);
+							}}
+							underlayColor="#0805"
+							disabled={maxCards.qDiamonds}
+						>
+							<>
+								{maxCards.qDiamonds && (
+									<View
+										style={{
+											width: "100%",
+											height: "100%",
+											backgroundColor: "#0008",
+											zIndex: 2,
+											position: "absolute",
+											top: 0,
+											left: 0,
+										}}
+									></View>
+								)}
+								<Image source={require("../../assets/Queen_of_Diamonds.png")} style={styles.card} />
+							</>
 						</TouchableHighlight>
-						<TouchableHighlight style={styles.cardBtn}>
-							<Image source={require("../../assets/Queen_of_Spades.png")} style={styles.card} />
+						<TouchableHighlight
+							style={[
+								styles.cardBtn,
+								{
+									backgroundColor:
+										currentCards.qSpades && !currentCards.qSpadesDouble
+											? "#0f05"
+											: currentCards.qSpadesDouble
+											? "#fd7e"
+											: "transparent",
+								},
+							]}
+							onPress={() => {
+								setCurrentCards({ ...currentCards, qSpades: false, qSpadesDouble: false });
+								setCard("qSpades");
+								setPopup(true);
+							}}
+							underlayColor="#0805"
+							disabled={maxCards.qSpades}
+						>
+							<>
+								{maxCards.qSpades && (
+									<View
+										style={{
+											width: "100%",
+											height: "100%",
+											backgroundColor: "#0008",
+											zIndex: 2,
+											position: "absolute",
+											top: 0,
+											left: 0,
+										}}
+									></View>
+								)}
+								<Image source={require("../../assets/Queen_of_Spades.png")} style={styles.card} />
+							</>
 						</TouchableHighlight>
-						<TouchableHighlight style={styles.cardBtn}>
-							<Image source={require("../../assets/Queen_of_Clubs.png")} style={styles.card} />
+						<TouchableHighlight
+							style={[
+								styles.cardBtn,
+								{
+									backgroundColor:
+										currentCards.qClubs && !currentCards.qClubsDouble
+											? "#0f05"
+											: currentCards.qClubsDouble
+											? "#fd7e"
+											: "transparent",
+								},
+							]}
+							onPress={() => {
+								setCurrentCards({ ...currentCards, qClubs: false, qClubsDouble: false });
+								setCard("qClubs");
+								setPopup(true);
+							}}
+							underlayColor="#0805"
+							disabled={maxCards.qClubs}
+						>
+							<>
+								{maxCards.qClubs && (
+									<View
+										style={{
+											width: "100%",
+											height: "100%",
+											backgroundColor: "#0008",
+											zIndex: 2,
+											position: "absolute",
+											top: 0,
+											left: 0,
+										}}
+									></View>
+								)}
+								<Image source={require("../../assets/Queen_of_Clubs.png")} style={styles.card} />
+							</>
 						</TouchableHighlight>
 					</View>
 
@@ -289,14 +458,19 @@ const ComplexPage = ({
 													currentCards.qHearts +
 													currentCards.qSpades) *
 													-25 +
-												currentCards.queenDouble * -50,
+												(currentCards.qClubsDouble +
+													currentCards.qDiamondsDouble +
+													currentCards.qHeartsDouble +
+													currentCards.qSpadesDouble) *
+													-50,
 										},
 									},
 								});
+
 								setMaxCards({
+									...currentCards,
+									diamonds: +maxCards.diamonds + +currentCards.diamonds,
 									takes: +maxCards.takes + +currentCards.takes,
-									king: currentCards.king,
-									kingDouble: currentCards.kingDouble,
 								});
 								setCurrentCards(initalState);
 								selectPlayer("");
@@ -340,48 +514,51 @@ const ComplexPage = ({
 								{
 									text: "Double",
 									onPress: () => {
-										if (selectedCard === "king")
-											setCurrentCards({
-												...currentCards,
-												king: true,
-												kingDouble: true,
-											});
-										else
-											setCurrentCards({
-												...currentCards,
-												[selectedCard]: true,
-												queenDouble: currentCards.queenDouble + 1,
-											});
+										setCurrentCards({
+											...currentCards,
+											[selectedCard]: true,
+											[`${selectedCard}Double`]: true,
+										});
 									},
 									color: "gold",
 								},
 						  ]
-						: [
-								...playerNames.slice(0, playerNames.indexOf(selectedPlayer)),
-								"Self",
-								...playerNames.slice(playerNames.indexOf(selectedPlayer) + 1),
-						  ].map((player) => ({
-								text: player,
-								onPress: () => {
-									if (player !== "Self")
-										setReward({ ...rewardArray, [player]: selectedCard === "king" ? 75 : 25 });
-
-									setPopup(false);
-								},
-								color: "green",
-						  }))
+						: []
 				}
 				onClose={() => {
 					setPopup(false);
-					setCurrentCards({ ...currentCards, king: false, kingDouble: false });
+					setCurrentCards({ ...currentCards, [selectedCard]: false, [`${selectedCard}Double`]: false });
 				}}
 			>
-				{!currentCards.king && !currentCards.kingDouble && (
+				{!currentCards[selectedCard] && !currentCards[`${selectedCard}Double`] && (
 					<Text style={{ marginBottom: 20 }}>Was this card marked(x2 Points)?</Text>
 				)}
-				{currentCards.kingDouble && (
+				{currentCards[`${selectedCard}Double`] && (
 					<>
 						<Text>Who marked it?</Text>
+						<View style={{ flexDirection: "row", marginTop: 10 }}>
+							{[
+								...playerNames.slice(0, playerNames.indexOf(selectedPlayer)),
+								"Self",
+								...playerNames.slice(playerNames.indexOf(selectedPlayer) + 1),
+							].map((player) => (
+								<View style={{ marginHorizontal: 5 }}>
+									<Button
+										title={player}
+										color="green"
+										onPress={() => {
+											if (player !== "Self")
+												setReward({
+													...rewardArray,
+													[player]: rewardArray[player] + selectedCard === "king" ? 75 : 25,
+												});
+
+											setPopup(false);
+										}}
+									/>
+								</View>
+							))}
+						</View>
 					</>
 				)}
 			</Popup>

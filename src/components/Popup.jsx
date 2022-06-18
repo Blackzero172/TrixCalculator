@@ -38,7 +38,7 @@ const styles = StyleSheet.create({
 	},
 
 	window: {
-		width: "80%",
+		maxWidth: "100%",
 		backgroundColor: "white",
 		justifyContent: "center",
 		alignItems: "center",
@@ -46,12 +46,12 @@ const styles = StyleSheet.create({
 		borderRadius: 10,
 	},
 	header: {
-		width: "100%",
+		width: "80%",
 		alignItems: "flex-end",
 		marginBottom: 20,
 	},
 	buttonContainer: {
-		width: "100%",
+		width: "80%",
 		paddingHorizontal: 30,
 		flexDirection: "row",
 		marginTop: 20,

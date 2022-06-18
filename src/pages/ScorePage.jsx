@@ -67,7 +67,7 @@ const ScorePage = ({ playerNames, playerScores, rounds, setScores }) => {
 					<Text
 						style={[
 							styles.text,
-							{ color: playerScores[name] > 0 ? "green" : playerNames[name] < 0 ? "#d00" : "black" },
+							{ color: playerScores[name] > 0 ? "green" : playerScores[name] < 0 ? "#d00" : "black" },
 						]}
 						key={i * 2}
 					>

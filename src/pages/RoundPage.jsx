@@ -86,12 +86,12 @@ const RoundPage = ({
 								<View key={i} style={{ alignItems: "center" }}>
 									{hasPlacement && (
 										<Text>
-											{player.trix.placement}
-											{player.trix.placement === 1
+											{player.trix?.placement}
+											{player.trix?.placement === 1
 												? "st"
-												: player.trix.placement === 2
+												: player.trix?.placement === 2
 												? "nd"
-												: player.trix.placement === 3
+												: player.trix?.placement === 3
 												? "rd"
 												: "th"}
 										</Text>
