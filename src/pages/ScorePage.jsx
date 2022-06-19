@@ -7,6 +7,12 @@ import { setScores, setIndex, setEdit } from "../actions/actionCreators";
 const screenWidth = Dimensions.get("window").width;
 const ScorePage = ({ playerNames, playerScores, rounds, setScores, isEdit, setIndex, setEdit }) => {
 	const navigate = useNavigate();
+	const lastRound = rounds[rounds.length - 1] || {};
+	const gameOver =
+		rounds.length >= 4 &&
+		(!lastRound[Object.keys(lastRound)[0]]?.hasOwnProperty("complex") ||
+			!lastRound[Object.keys(lastRound)[0]]?.hasOwnProperty("trix"));
+
 	useEffect(() => {
 		const obj = {};
 		playerNames.forEach((player) => {
@@ -92,15 +98,27 @@ const ScorePage = ({ playerNames, playerScores, rounds, setScores, isEdit, setIn
 					<RoundCard round={round} playerNames={playerNames} />
 				</View>
 			))}
-			<View style={{ paddingHorizontal: 30, marginVertical: 30 }}>
-				<Button
-					color="green"
-					title="Add Round"
-					onPress={() => {
-						navigate("/new");
-					}}
-					disabled={isEdit}
-				/>
+			<View
+				style={
+					!gameOver
+						? { paddingHorizontal: 30, justifyContent: "center", marginTop: 20, marginBottom: 30 }
+						: { alignItems: "center", marginBottom: 10 }
+				}
+			>
+				{!gameOver ? (
+					<Button
+						color="green"
+						title="Add Round"
+						onPress={() => {
+							navigate("/new");
+						}}
+						disabled={isEdit}
+					/>
+				) : (
+					<Text>
+						{playerNames[Object.values(playerScores).indexOf(Math.max(...Object.values(playerScores)))]} Wins
+					</Text>
+				)}
 			</View>
 			<View
 				style={[

@@ -485,7 +485,7 @@ const ComplexPage = ({
 													currentCards.qDiamondsDouble +
 													currentCards.qHeartsDouble +
 													currentCards.qSpadesDouble) *
-													-50,
+													-25,
 										},
 									},
 								});

@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View } from "react-native";
+import { Button, StyleSheet, Text, View } from "react-native";
 import { useNavigate } from "react-router";
 
 const InstructionsPage = () => {
@@ -12,6 +12,15 @@ const InstructionsPage = () => {
 				This part of the game closely resembles Solitare in the fact that you need to play the cards in order
 				, e.g
 			</Text>
+			<View style={{ marginTop: 20, alignItems: "center" }}>
+				<Button
+					title="Back"
+					color="#d00"
+					onPress={() => {
+						navigate("/");
+					}}
+				/>
+			</View>
 		</View>
 	);
 };
