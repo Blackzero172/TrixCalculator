@@ -8,7 +8,10 @@ import {
 	selectPlayer,
 	setCurrentCards,
 	setCurrentRound,
+	setIndex,
+	setEdit,
 } from "../actions/actionCreators";
+import { useEffect } from "react";
 const screenWidth = Dimensions.get("window").width;
 const RoundPage = ({
 	roundPhase,
@@ -18,13 +21,29 @@ const RoundPage = ({
 	setRounds,
 	currentRound,
 	setCurrentRound,
+	isEdit,
+	roundIndex,
+	setEdit,
 }) => {
 	const navigate = useNavigate();
-	let lastRound = rounds[rounds.length - 1] || {};
-	let lastRoundPlayer = lastRound[Object.keys(lastRound)[0]] || {};
-	const newRoundCondition =
-		!lastRoundPlayer.hasOwnProperty("complex") ||
-		(lastRoundPlayer.hasOwnProperty("complex") && lastRoundPlayer.hasOwnProperty("trix"));
+	let lastRound = (roundIndex ? rounds[roundIndex] : rounds[rounds.length - 1]) || {};
+	const lastRoundPlayer = lastRound[Object.keys(lastRound)[0]] || {};
+	let editRound = rounds[roundIndex] || {};
+	const editRoundPlayer = editRound[Object.keys(editRound)[0]] || {};
+	useEffect(() => {
+		if (isEdit) {
+			if (editRoundPlayer.hasOwnProperty("complex") && !editRoundPlayer.hasOwnProperty("trix"))
+				setRoundPhase("Complex");
+			else if (editRoundPlayer.hasOwnProperty("trix") && !editRoundPlayer.hasOwnProperty("complex"))
+				setRoundPhase("Trix");
+			else setRoundPhase(null);
+		}
+	}, []);
+
+	const newRoundCondition = !isEdit
+		? !lastRoundPlayer.hasOwnProperty("complex") ||
+		  (lastRoundPlayer.hasOwnProperty("complex") && lastRoundPlayer.hasOwnProperty("trix"))
+		: editRoundPlayer.hasOwnProperty("complex") && editRoundPlayer.hasOwnProperty("trix");
 	return (
 		<View style={{ alignItems: "center" }}>
 			{!roundPhase && (
@@ -50,6 +69,15 @@ const RoundPage = ({
 							title="Back"
 							color="#d00"
 							onPress={() => {
+								if (isEdit)
+									setRoundPhase(
+										lastRoundPlayer.hasOwnProperty("complex")
+											? "Trix"
+											: lastRoundPlayer.hasOwnProperty("trix")
+											? "Complex"
+											: null
+									);
+								setIndex(null);
 								navigate("/score");
 							}}
 						/>
@@ -121,17 +149,33 @@ const RoundPage = ({
 						title="Submit"
 						disabled={Object.keys(currentRound).length < 4}
 						onPress={() => {
-							if (newRoundCondition) setRounds([...rounds, currentRound]);
-							else {
+							if (isEdit) {
 								playerNames.forEach((player) => {
-									lastRound[player] = { ...currentRound[player], ...lastRound[player] };
+									editRound[player] = { ...editRound[player], ...currentRound[player] };
 								});
-								setRounds([...rounds.slice(0, rounds.length - 1), lastRound]);
+								setRounds([...rounds.slice(0, roundIndex), editRound, ...rounds.slice(roundIndex + 1)]);
+
+								setRoundPhase(
+									lastRoundPlayer.hasOwnProperty("complex")
+										? "Trix"
+										: lastRoundPlayer.hasOwnProperty("trix")
+										? "Complex"
+										: null
+								);
+								setEdit(false);
+							} else {
+								if (newRoundCondition) setRounds([...rounds, currentRound]);
+								else {
+									playerNames.forEach((player) => {
+										lastRound[player] = { ...currentRound[player], ...lastRound[player] };
+									});
+									setRounds([...rounds.slice(0, rounds.length - 1), lastRound]);
+								}
+
+								if (newRoundCondition) setRoundPhase("Complex");
+								else setRoundPhase(null);
 							}
 							setCurrentRound({});
-
-							if (newRoundCondition) setRoundPhase("Complex");
-							else setRoundPhase(null);
 							navigate("/score");
 						}}
 					/>
@@ -154,6 +198,8 @@ const mapStateToProps = (state) => {
 		roundPhase: state.roundPhase,
 		rounds: state.rounds,
 		currentRound: state.currentRound,
+		roundIndex: state.roundIndex,
+		isEdit: state.isEdit,
 	};
 };
 export default connect(mapStateToProps, {
@@ -162,4 +208,6 @@ export default connect(mapStateToProps, {
 	selectPlayer,
 	setCurrentCards,
 	setCurrentRound,
+	setIndex,
+	setEdit,
 })(RoundPage);

@@ -58,14 +58,24 @@ const currentCardsReducer = (
 	if (action.type === "ADD_CURRENT_CARDS") return action.payload;
 	return currentCards;
 };
+const isEditReducer = (isEdit = false, action) => {
+	if (action.type === "EDIT_ROUND") return action.payload;
+	return isEdit;
+};
+const roundIndexReducer = (roundIndex = null, action) => {
+	if (action.type === "SET_INDEX") return action.payload;
+	return roundIndex;
+};
 
 export default combineReducers({
 	playerNames: playerNamesReducer,
 	playerScores: playerScoresReducer,
 	selectedPlayer: selectedPlayerReducer,
+	isEdit: isEditReducer,
 	rounds: roundsReducer,
 	currentRound: currentRoundReducer,
 	roundPhase: roundPhaseReducer,
+	roundIndex: roundIndexReducer,
 	maxCards: maxCardsReducer,
 	currentCards: currentCardsReducer,
 });

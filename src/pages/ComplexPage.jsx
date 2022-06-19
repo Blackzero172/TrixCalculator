@@ -8,6 +8,8 @@ import {
 	setMaxCards,
 	setRoundPhase,
 	setRounds,
+	setIndex,
+	setEdit,
 } from "../actions/actionCreators";
 import { connect } from "react-redux";
 import { useEffect } from "react";
@@ -51,6 +53,9 @@ const ComplexPage = ({
 	setRoundPhase,
 	setRounds,
 	rounds,
+	isEdit,
+	roundIndex,
+	setEdit,
 }) => {
 	const navigate = useNavigate();
 	const [popupOpen, setPopup] = useState(false);
@@ -58,6 +63,7 @@ const ComplexPage = ({
 	const [rewardArray, setReward] = useState({});
 	let lastRound = rounds[rounds.length - 1] || {};
 	let lastRoundPlayer = lastRound[Object.keys(lastRound)[0]] || {};
+	let editRound = rounds[roundIndex] || {};
 	let specialCardsCondition =
 		maxCards.king &&
 		maxCards.qClubs &&
@@ -70,15 +76,16 @@ const ComplexPage = ({
 		(lastRoundPlayer.hasOwnProperty("complex") && lastRoundPlayer.hasOwnProperty("trix"));
 	useEffect(() => {
 		const resetComplex = () => {
-			if (!lastRoundPlayer.hasOwnProperty("trix")) setRoundPhase("Trix");
-			else setRoundPhase(null);
+			if (!isEdit)
+				if (!lastRoundPlayer.hasOwnProperty("trix")) setRoundPhase("Trix");
+				else setRoundPhase(null);
 			setCurrentRound({});
 			setMaxCards(maxInitalState);
 		};
+		console.log(rewardArray);
 		if (maxCards.takes >= 13) {
 			let currentRoundCopy = { ...currentRound };
 			playerNames.forEach((player) => {
-				console.log(!currentRound[player]?.hasOwnProperty("complex"));
 				if (!currentRound[player]?.hasOwnProperty("complex"))
 					currentRoundCopy = {
 						...currentRoundCopy,
@@ -99,12 +106,28 @@ const ComplexPage = ({
 						},
 					};
 			});
-			if (newRoundCondition) setRounds([...rounds, currentRoundCopy]);
-			else {
+			if (isEdit) {
 				playerNames.forEach((player) => {
-					lastRound[player] = { ...lastRound[player], ...currentRoundCopy[player] };
+					editRound[player] = { ...editRound[player], ...currentRoundCopy[player] };
 				});
-				setRounds([...rounds.slice(0, rounds.length - 1), lastRound]);
+				setRounds([...rounds.slice(0, roundIndex), editRound, ...rounds.slice(roundIndex + 1)]);
+
+				setRoundPhase(
+					lastRoundPlayer.hasOwnProperty("complex")
+						? "Trix"
+						: lastRoundPlayer.hasOwnProperty("trix")
+						? "Complex"
+						: null
+				);
+				setEdit(false);
+			} else {
+				if (newRoundCondition) setRounds([...rounds, currentRoundCopy]);
+				else {
+					playerNames.forEach((player) => {
+						lastRound[player] = { ...lastRound[player], ...currentRoundCopy[player] };
+					});
+					setRounds([...rounds.slice(0, rounds.length - 1), lastRound]);
+				}
 			}
 			resetComplex();
 			navigate("/score");
@@ -547,10 +570,11 @@ const ComplexPage = ({
 										title={player}
 										color="green"
 										onPress={() => {
+											const reward = selectedCard === "king" ? 75 : 25;
 											if (player !== "Self")
 												setReward({
 													...rewardArray,
-													[player]: rewardArray[player] + selectedCard === "king" ? 75 : 25,
+													[player]: rewardArray[player] || 0 + reward,
 												});
 
 											setPopup(false);
@@ -597,6 +621,8 @@ const mapStateToProps = (state) => {
 		currentCards: state.currentCards,
 		maxCards: state.maxCards,
 		rounds: state.rounds,
+		isEdit: state.isEdit,
+		roundIndex: state.roundIndex,
 	};
 };
 export default connect(mapStateToProps, {
@@ -606,4 +632,6 @@ export default connect(mapStateToProps, {
 	setCurrentRound,
 	setCurrentCards,
 	setMaxCards,
+	setIndex,
+	setEdit,
 })(ComplexPage);

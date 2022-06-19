@@ -10,6 +10,7 @@ const RoundCard = ({ round, playerNames }) => {
 				width: screenWidth,
 				justifyContent: "space-evenly",
 				borderTopWidth: 2,
+				borderBottomWidth: 2,
 			}}
 		>
 			{playerNames.map((player) => (
