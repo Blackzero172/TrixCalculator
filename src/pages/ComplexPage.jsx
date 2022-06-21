@@ -64,16 +64,20 @@ const ComplexPage = ({
 	let lastRound = rounds[rounds.length - 1] || {};
 	let lastRoundPlayer = lastRound[Object.keys(lastRound)[0]] || {};
 	let editRound = rounds[roundIndex] || {};
+	const editRoundPlayer = editRound[Object.keys(editRound)[0]] || {};
+
 	let specialCardsCondition =
+		maxCards.takes >= 13 &&
 		maxCards.king &&
 		maxCards.qClubs &&
 		maxCards.qDiamonds &&
 		maxCards.qHearts &&
 		maxCards.qSpades &&
 		maxCards.diamonds >= 13;
-	const newRoundCondition =
-		!lastRoundPlayer.hasOwnProperty("trix") ||
-		(lastRoundPlayer.hasOwnProperty("complex") && lastRoundPlayer.hasOwnProperty("trix"));
+	const newRoundCondition = !isEdit
+		? !lastRoundPlayer.hasOwnProperty("trix") ||
+		  (lastRoundPlayer.hasOwnProperty("complex") && lastRoundPlayer.hasOwnProperty("trix"))
+		: editRoundPlayer.hasOwnProperty("complex") && editRoundPlayer.hasOwnProperty("trix");
 	useEffect(() => {
 		const resetComplex = () => {
 			if (!isEdit)
@@ -82,7 +86,6 @@ const ComplexPage = ({
 			setCurrentRound({});
 			setMaxCards(maxInitalState);
 		};
-		console.log(rewardArray);
 		if (maxCards.takes >= 13) {
 			let currentRoundCopy = { ...currentRound };
 			playerNames.forEach((player) => {
@@ -151,17 +154,29 @@ const ComplexPage = ({
 						))}
 					</View>
 					<View style={{ marginTop: 20 }}>
-						{newRoundCondition && (
-							<Button
-								title="Back"
-								color="#d00"
-								onPress={() => {
-									setRoundPhase(null);
-									setCurrentRound({});
-									setMaxCards(maxInitalState);
-								}}
-							/>
-						)}
+						<Button
+							title="Back"
+							color="#d00"
+							onPress={() => {
+								if (newRoundCondition) setRoundPhase(null);
+								else {
+									if (isEdit) {
+										setRoundPhase(
+											lastRoundPlayer.hasOwnProperty("complex")
+												? "Trix"
+												: lastRoundPlayer.hasOwnProperty("trix")
+												? "Complex"
+												: null
+										);
+										setIndex(null);
+									}
+									navigate("/score");
+								}
+								setCurrentRound({});
+
+								setMaxCards(maxInitalState);
+							}}
+						/>
 					</View>
 				</>
 			) : selectedPlayer !== "" && !currentRound[selectedPlayer]?.complex.takes ? (
@@ -199,50 +214,20 @@ const ComplexPage = ({
 								selectPlayer("");
 								setCurrentCards(initalState);
 							} else {
-								if (currentCards.takes >= 8)
-									Alert.alert(
-										"That's way too many takes",
-										`Are you sure that this player took *${currentCards.takes}* takes`,
-										[
-											{
-												text: "Yes",
-												onPress: () => {
-													setCurrentRound({
-														...currentRound,
-														[selectedPlayer]: {
-															...currentRound[selectedPlayer],
-															complex: !specialCardsCondition
-																? {
-																		takes: currentCards.takes,
-																  }
-																: {
-																		...initalState,
-																		takes: currentCards.takes,
-																  },
-														},
-													});
-												},
-											},
-											{
-												text: "No",
-											},
-										]
-									);
-								else
-									setCurrentRound({
-										...currentRound,
-										[selectedPlayer]: {
-											...currentRound[selectedPlayer],
-											complex: !specialCardsCondition
-												? {
-														takes: currentCards.takes,
-												  }
-												: {
-														...initalState,
-														takes: currentCards.takes,
-												  },
-										},
-									});
+								setCurrentRound({
+									...currentRound,
+									[selectedPlayer]: {
+										...currentRound[selectedPlayer],
+										complex: !specialCardsCondition
+											? {
+													takes: currentCards.takes,
+											  }
+											: {
+													...initalState,
+													takes: currentCards.takes,
+											  },
+									},
+								});
 								if (specialCardsCondition) selectPlayer("");
 							}
 						}}
@@ -574,7 +559,13 @@ const ComplexPage = ({
 											if (player !== "Self")
 												setReward({
 													...rewardArray,
-													[player]: rewardArray[player] || 0 + reward,
+													[player]:
+														(currentCards.qClubsDouble +
+															currentCards.qHeartsDouble +
+															currentCards.qDiamondsDouble +
+															currentCards.qSpadesDouble) *
+															25 +
+														currentCards.kingDouble * 75,
 												});
 
 											setPopup(false);

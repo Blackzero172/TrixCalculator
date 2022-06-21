@@ -69,14 +69,13 @@ const RoundPage = ({
 							title="Back"
 							color="#d00"
 							onPress={() => {
-								if (isEdit)
-									setRoundPhase(
-										lastRoundPlayer.hasOwnProperty("complex")
-											? "Trix"
-											: lastRoundPlayer.hasOwnProperty("trix")
-											? "Complex"
-											: null
-									);
+								setRoundPhase(
+									lastRoundPlayer.hasOwnProperty("complex")
+										? "Trix"
+										: lastRoundPlayer.hasOwnProperty("trix")
+										? "Complex"
+										: null
+								);
 								setIndex(null);
 								navigate("/score");
 							}}
@@ -95,16 +94,28 @@ const RoundPage = ({
 							}}
 							disabled={Object.keys(currentRound).length < 1}
 						/>
-						{newRoundCondition && (
-							<Button
-								title="Back"
-								onPress={() => {
-									setRoundPhase(null);
-									setCurrentRound({});
-								}}
-								color="#d00"
-							/>
-						)}
+
+						<Button
+							title="Back"
+							onPress={() => {
+								if (newRoundCondition) setRoundPhase(null);
+								else {
+									if (isEdit) {
+										setRoundPhase(
+											lastRoundPlayer.hasOwnProperty("complex")
+												? "Trix"
+												: lastRoundPlayer.hasOwnProperty("trix")
+												? "Complex"
+												: null
+										);
+										setIndex(null);
+									}
+									navigate("/score");
+								}
+								setCurrentRound({});
+							}}
+							color="#d00"
+						/>
 					</View>
 					<View style={[styles.container, { marginVertical: 50 }]}>
 						{playerNames.map((name, i) => {
