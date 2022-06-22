@@ -476,7 +476,11 @@ const ComplexPage = ({
 								});
 
 								setMaxCards({
-									...currentCards,
+									qClubs: maxCards.qClubs ? maxCards.qClubs : currentCards.qClubs,
+									qSpades: maxCards.qSpades ? maxCards.qSpades : currentCards.qSpades,
+									qHearts: maxCards.qHearts ? maxCards.qHearts : currentCards.qHearts,
+									qDiamonds: maxCards.qDiamonds ? maxCards.qDiamonds : currentCards.qDiamonds,
+									king: maxCards.king ? maxCards.king : currentCards.king,
 									diamonds: +maxCards.diamonds + +currentCards.diamonds,
 									takes: +maxCards.takes + +currentCards.takes,
 								});
@@ -555,7 +559,6 @@ const ComplexPage = ({
 										title={player}
 										color="green"
 										onPress={() => {
-											const reward = selectedCard === "king" ? 75 : 25;
 											if (player !== "Self")
 												setReward({
 													...rewardArray,

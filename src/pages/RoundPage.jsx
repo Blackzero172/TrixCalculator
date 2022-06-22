@@ -69,13 +69,14 @@ const RoundPage = ({
 							title="Back"
 							color="#d00"
 							onPress={() => {
-								setRoundPhase(
-									lastRoundPlayer.hasOwnProperty("complex")
-										? "Trix"
-										: lastRoundPlayer.hasOwnProperty("trix")
-										? "Complex"
-										: null
-								);
+								if (isEdit)
+									setRoundPhase(
+										lastRoundPlayer.hasOwnProperty("complex")
+											? "Trix"
+											: lastRoundPlayer.hasOwnProperty("trix")
+											? "Complex"
+											: null
+									);
 								setIndex(null);
 								navigate("/score");
 							}}
