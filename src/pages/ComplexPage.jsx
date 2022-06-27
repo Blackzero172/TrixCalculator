@@ -81,7 +81,7 @@ const ComplexPage = ({
 	useEffect(() => {
 		const resetComplex = () => {
 			if (!isEdit)
-				if (!lastRoundPlayer.hasOwnProperty("trix")) setRoundPhase("Trix");
+				if (newRoundCondition) setRoundPhase("Trix");
 				else setRoundPhase(null);
 			setCurrentRound({});
 			setMaxCards(maxInitalState);
@@ -532,7 +532,7 @@ const ComplexPage = ({
 											[`${selectedCard}Double`]: true,
 										});
 									},
-									color: "gold",
+									color: "#db5",
 								},
 						  ]
 						: []

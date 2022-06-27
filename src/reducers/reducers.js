@@ -24,7 +24,7 @@ const roundPhaseReducer = (roundPhase = null, action) => {
 	return roundPhase;
 };
 const maxCardsReducer = (
-	maxCards = (initalState = {
+	maxCards = {
 		takes: 0,
 		king: false,
 		diamonds: 0,
@@ -32,14 +32,14 @@ const maxCardsReducer = (
 		qHearts: false,
 		qSpades: false,
 		qClubs: false,
-	}),
+	},
 	action
 ) => {
 	if (action.type === "ADD_MAX_CARDS") return action.payload;
 	return maxCards;
 };
 const currentCardsReducer = (
-	currentCards = (initalState = {
+	currentCards = {
 		takes: 0,
 		king: false,
 		kingDouble: false,
@@ -52,7 +52,7 @@ const currentCardsReducer = (
 		qHeartsDouble: false,
 		qSpadesDouble: false,
 		qClubsDouble: false,
-	}),
+	},
 	action
 ) => {
 	if (action.type === "ADD_CURRENT_CARDS") return action.payload;
