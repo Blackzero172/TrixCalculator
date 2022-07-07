@@ -12,9 +12,8 @@ import InstructionsPage from "./src/pages/InstructionsPage";
 import RoundPage from "./src/pages/RoundPage";
 import reducers from "./src/reducers/reducers";
 import { devToolsEnhancer } from "redux-devtools-extension";
-
+import BannerAd from "./src/components/BannerAd";
 const store = createStore(reducers, devToolsEnhancer());
-
 export default function App() {
 	return (
 		<Provider store={store}>
@@ -28,6 +27,7 @@ export default function App() {
 						<Route path="/score" exact element={<ScorePage />} />
 					</Routes>
 					<StatusBar style="auto" />
+					<BannerAd />
 				</NativeRouter>
 			</SafeAreaView>
 		</Provider>

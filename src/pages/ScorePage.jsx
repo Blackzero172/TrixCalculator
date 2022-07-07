@@ -4,6 +4,7 @@ import { useNavigate } from "react-router";
 import { connect } from "react-redux";
 import RoundCard from "../components/RoundCard";
 import { setScores, setIndex, setEdit, setRounds, setRoundPhase } from "../actions/actionCreators";
+import { AdMobInterstitial } from "expo-ads-admob";
 const screenWidth = Dimensions.get("window").width;
 const ScorePage = ({
 	playerNames,
@@ -16,6 +17,20 @@ const ScorePage = ({
 	setRounds,
 	setRoundPhase,
 }) => {
+	const setupInterstatialAd = async () => {
+		AdMobInterstitial.setAdUnitID("ca-app-pub-3940256099942544/1033173712");
+		AdMobInterstitial.addEventListener("interstitialDidClose", () => {
+			AdMobInterstitial.dismissAdAsync();
+		});
+		try {
+			await AdMobInterstitial.requestAdAsync();
+		} catch (e) {}
+	};
+	const showInterstatialAd = async () => {
+		try {
+			await AdMobInterstitial.showAdAsync();
+		} catch (e) {}
+	};
 	const navigate = useNavigate();
 	const lastRound = rounds[rounds.length - 1] || {};
 	const gameOver =
@@ -29,6 +44,7 @@ const ScorePage = ({
 			obj[player] = 0;
 		});
 		setScores(obj);
+		setupInterstatialAd();
 	}, []);
 	useEffect(() => {
 		const obj = {};
@@ -48,6 +64,13 @@ const ScorePage = ({
 			}
 			setScores(obj);
 		});
+		if (
+			rounds.length >= 0 &&
+			lastRound[Object.keys(lastRound)[0]]?.hasOwnProperty("complex") &&
+			lastRound[Object.keys(lastRound)[0]]?.hasOwnProperty("trix")
+		) {
+			showInterstatialAd();
+		}
 	}, [rounds]);
 	const resetGame = () => {
 		navigate("/name");
