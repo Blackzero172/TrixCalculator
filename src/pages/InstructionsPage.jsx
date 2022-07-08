@@ -5,6 +5,21 @@ const InstructionsPage = () => {
 	const navigate = useNavigate();
 	return (
 		<>
+			<View
+				style={{
+					padding: 30,
+					alignItems: "center",
+					justifyContent: "flex-end",
+				}}
+			>
+				<Button
+					title="Back"
+					color="#d00"
+					onPress={() => {
+						navigate("/");
+					}}
+				/>
+			</View>
 			<ScrollView style={styles.container}>
 				<Text style={[styles.heading, { marginTop: 20 }]}>Instructions (4 Players)</Text>
 				<Text>Trix Complex is a four-player card game, we will explain the rules of Trix Complex</Text>
@@ -66,21 +81,6 @@ const InstructionsPage = () => {
 					gets 50 points, depending on who runs out of cards first.
 				</Text>
 			</ScrollView>
-			<View
-				style={{
-					marginVertical: 20,
-					alignItems: "center",
-					justifyContent: "center",
-				}}
-			>
-				<Button
-					title="Back"
-					color="#d00"
-					onPress={() => {
-						navigate("/");
-					}}
-				/>
-			</View>
 		</>
 	);
 };

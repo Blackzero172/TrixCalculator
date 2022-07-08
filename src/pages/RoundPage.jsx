@@ -12,6 +12,7 @@ import {
 	setEdit,
 } from "../actions/actionCreators";
 import { useEffect } from "react";
+import { useTranslation } from "react-i18next";
 const screenWidth = Dimensions.get("window").width;
 const RoundPage = ({
 	roundPhase,
@@ -26,6 +27,7 @@ const RoundPage = ({
 	setEdit,
 }) => {
 	const navigate = useNavigate();
+	const { t, i18n } = useTranslation();
 	let lastRound = (roundIndex ? rounds[roundIndex] : rounds[rounds.length - 1]) || {};
 	const lastRoundPlayer = lastRound[Object.keys(lastRound)[0]] || {};
 	let editRound = rounds[roundIndex] || {};
@@ -50,14 +52,14 @@ const RoundPage = ({
 				<>
 					<View style={styles.container}>
 						<Button
-							title="Trix"
+							title={t("trix")}
 							color="green"
 							onPress={() => {
 								setRoundPhase("Trix");
 							}}
 						/>
 						<Button
-							title="Complex"
+							title={t("complex")}
 							color="green"
 							onPress={() => {
 								setRoundPhase("Complex");
@@ -66,7 +68,7 @@ const RoundPage = ({
 					</View>
 					<View style={{ marginTop: 20 }}>
 						<Button
-							title="Back"
+							title={t("back")}
 							color="#d00"
 							onPress={() => {
 								if (isEdit)
@@ -88,7 +90,7 @@ const RoundPage = ({
 				<>
 					<View style={styles.container}>
 						<Button
-							title="Reset"
+							title={t("reset")}
 							color="#d00"
 							onPress={() => {
 								setCurrentRound({});
@@ -97,7 +99,7 @@ const RoundPage = ({
 						/>
 
 						<Button
-							title="Back"
+							title={t("back")}
 							onPress={() => {
 								if (newRoundCondition) setRoundPhase(null);
 								else {
@@ -126,14 +128,23 @@ const RoundPage = ({
 								<View key={i} style={{ alignItems: "center" }}>
 									{hasPlacement && (
 										<Text>
-											{player.trix?.placement}
-											{player.trix?.placement === 1
-												? "st"
+											{i18n.language === "en"
+												? `${player.trix?.placement} ${
+														player.trix?.placement === 1
+															? "st"
+															: player.trix?.placement === 2
+															? "nd"
+															: player.trix?.placement === 3
+															? "rd"
+															: "th"
+												  }`
+												: player.trix?.placement === 1
+												? "الأول"
 												: player.trix?.placement === 2
-												? "nd"
+												? "الثاني"
 												: player.trix?.placement === 3
-												? "rd"
-												: "th"}
+												? "الثالث"
+												: "الرابع"}
 										</Text>
 									)}
 									<Button
@@ -158,7 +169,7 @@ const RoundPage = ({
 						})}
 					</View>
 					<Button
-						title="Submit"
+						title={t("submit")}
 						disabled={Object.keys(currentRound).length < 4}
 						onPress={() => {
 							if (isEdit) {

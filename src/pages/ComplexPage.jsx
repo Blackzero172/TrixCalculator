@@ -15,6 +15,7 @@ import { connect } from "react-redux";
 import { useEffect } from "react";
 import { useNavigate } from "react-router";
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 const initalState = {
 	takes: 0,
 	king: false,
@@ -58,6 +59,7 @@ const ComplexPage = ({
 	setEdit,
 }) => {
 	const navigate = useNavigate();
+	const { t } = useTranslation();
 	const [popupOpen, setPopup] = useState(false);
 	const [selectedCard, setCard] = useState("");
 	const [rewardArray, setReward] = useState({});
@@ -155,7 +157,7 @@ const ComplexPage = ({
 					</View>
 					<View style={{ marginTop: 20 }}>
 						<Button
-							title="Back"
+							title={t("back")}
 							color="#d00"
 							onPress={() => {
 								if (newRoundCondition) setRoundPhase(null);
@@ -183,8 +185,8 @@ const ComplexPage = ({
 				<>
 					<Text style={{ fontSize: 30 }}>{selectedPlayer}</Text>
 					<CustomInput
-						label="# of takes"
-						placeholder="Enter # of takes"
+						label={t("compInputLabel")}
+						placeholder={t("compInputPlaceholder")}
 						value={currentCards.takes}
 						type="number-pad"
 						onChange={(text) => {
@@ -196,7 +198,7 @@ const ComplexPage = ({
 						}}
 					/>
 					<Button
-						title="Next"
+						title={t("next")}
 						disabled={currentCards.takes === 0 || currentCards.takes === ""}
 						onPress={() => {
 							if (+currentCards.takes === 0) {
@@ -234,7 +236,7 @@ const ComplexPage = ({
 					/>
 					<View style={{ marginTop: 10 }}>
 						<Button
-							title="Back"
+							title={t("back")}
 							onPress={() => {
 								setCurrentCards(initalState);
 								selectPlayer("");
@@ -246,7 +248,7 @@ const ComplexPage = ({
 			) : (
 				<>
 					<CustomInput
-						label="Diamonds"
+						label={t("diamonds")}
 						value={currentCards.diamonds}
 						onChange={(text) => {
 							{
@@ -449,7 +451,7 @@ const ComplexPage = ({
 
 					<View style={{ marginTop: 20 }}>
 						<Button
-							title="Confirm"
+							title={t("submit")}
 							onPress={() => {
 								setCurrentRound({
 									...currentRound,
@@ -491,7 +493,7 @@ const ComplexPage = ({
 					</View>
 					<View style={{ marginTop: 20 }}>
 						<Button
-							title="Back"
+							title={t("back")}
 							onPress={() => {
 								setCurrentRound({
 									...currentRound,
@@ -516,7 +518,7 @@ const ComplexPage = ({
 					!currentCards[selectedCard]
 						? [
 								{
-									text: "Normal",
+									text: t("normal"),
 									onPress: () => {
 										setCurrentCards({ ...currentCards, [selectedCard]: true });
 										setPopup(false);
@@ -524,7 +526,7 @@ const ComplexPage = ({
 									color: "green",
 								},
 								{
-									text: "Double",
+									text: t("double"),
 									onPress: () => {
 										setCurrentCards({
 											...currentCards,
@@ -543,11 +545,11 @@ const ComplexPage = ({
 				}}
 			>
 				{!currentCards[selectedCard] && !currentCards[`${selectedCard}Double`] && (
-					<Text style={{ marginBottom: 20 }}>Was this card marked(x2 Points)?</Text>
+					<Text style={{ marginBottom: 20 }}>{t("doubleAlert")}</Text>
 				)}
 				{currentCards[`${selectedCard}Double`] && (
 					<>
-						<Text>Who marked it?</Text>
+						<Text>{t("markAlert")}</Text>
 						<View style={{ flexDirection: "row", marginTop: 10 }}>
 							{[
 								...playerNames.slice(0, playerNames.indexOf(selectedPlayer)),

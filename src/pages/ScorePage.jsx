@@ -5,6 +5,7 @@ import { connect } from "react-redux";
 import RoundCard from "../components/RoundCard";
 import { setScores, setIndex, setEdit, setRounds, setRoundPhase } from "../actions/actionCreators";
 import { AdMobInterstitial } from "expo-ads-admob";
+import { useTranslation } from "react-i18next";
 const screenWidth = Dimensions.get("window").width;
 const ScorePage = ({
 	playerNames,
@@ -17,6 +18,7 @@ const ScorePage = ({
 	setRounds,
 	setRoundPhase,
 }) => {
+	const { t } = useTranslation();
 	const setupInterstatialAd = async () => {
 		AdMobInterstitial.setAdUnitID("ca-app-pub-3940256099942544/1033173712");
 		AdMobInterstitial.addEventListener("interstitialDidClose", () => {
@@ -87,16 +89,16 @@ const ScorePage = ({
 		<>
 			<View style={{ position: "absolute", top: 50 }}>
 				<Button
-					title="New Game"
+					title={t("newGame")}
 					color="#d00"
 					onPress={() => {
 						if (!gameOver)
-							Alert.alert("Are you sure you want to start a new game", "", [
+							Alert.alert(t("newGameAlert"), "", [
 								{
-									text: "Yes",
+									text: t("yes"),
 									onPress: resetGame,
 								},
-								{ text: "No" },
+								{ text: t("no") },
 							]);
 						else {
 							resetGame();
@@ -108,7 +110,7 @@ const ScorePage = ({
 				{rounds.length > 0 && (
 					<View style={{ marginBottom: 50, alignItems: "center" }}>
 						<Button
-							title={isEdit ? "Back" : "Edit"}
+							title={isEdit ? t("back") : t("edit")}
 							onPress={
 								isEdit
 									? () => {
@@ -120,7 +122,7 @@ const ScorePage = ({
 							}
 							color={isEdit ? "#d00" : "green"}
 						/>
-						{isEdit && <Text>Press on a round to edit it</Text>}
+						{isEdit && <Text>{t("editText")}</Text>}
 					</View>
 				)}
 				<View style={styles.container}>
@@ -140,12 +142,12 @@ const ScorePage = ({
 								}}
 								style={{
 									width: "100%",
-									backgroundColor: "#0806",
+									backgroundColor: "#3338",
 									position: "absolute",
 									height: "100%",
 									zIndex: 2,
 								}}
-								underlayColor="#080a"
+								underlayColor="#333a"
 							>
 								<View
 									style={{
@@ -155,7 +157,17 @@ const ScorePage = ({
 										alignItems: "center",
 									}}
 								>
-									<Text style={{ backgroundColor: "#0806", fontSize: 20 }}>Edit</Text>
+									<Text
+										style={{
+											backgroundColor: "#080",
+											fontSize: 20,
+											paddingVertical: 5,
+											paddingHorizontal: 10,
+											color: "#ccc",
+										}}
+									>
+										{t("edit")}
+									</Text>
 								</View>
 							</TouchableHighlight>
 						)}
@@ -172,7 +184,7 @@ const ScorePage = ({
 					{!gameOver ? (
 						<Button
 							color="green"
-							title="Add Round"
+							title={t("addRound")}
 							onPress={() => {
 								navigate("/new");
 							}}
@@ -180,8 +192,8 @@ const ScorePage = ({
 						/>
 					) : (
 						<Text>
-							{playerNames[Object.values(playerScores).indexOf(Math.max(...Object.values(playerScores)))]}{" "}
-							Wins
+							{playerNames[Object.values(playerScores).indexOf(Math.max(...Object.values(playerScores)))]}
+							{t("wins")}
 						</Text>
 					)}
 				</View>

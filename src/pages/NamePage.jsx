@@ -4,14 +4,16 @@ import { connect } from "react-redux";
 
 import CustomInput from "../components/CustomInput";
 import { setNames } from "../actions/actionCreators";
+import { useTranslation } from "react-i18next";
 
 const NamePage = ({ playerNames, setNames }) => {
 	let navigate = useNavigate();
+	const { t } = useTranslation();
 	return (
 		<View style={styles.container}>
 			{playerNames.map((name, i) => (
 				<CustomInput
-					label={`Player ${i + 1}`}
+					label={`${t("player")} ${i + 1}`}
 					value={name}
 					onChange={(text) => {
 						setNames([...playerNames.slice(0, i), text, ...playerNames.slice(i + 1)]);
@@ -21,7 +23,7 @@ const NamePage = ({ playerNames, setNames }) => {
 				/>
 			))}
 			<Button
-				title="Continue"
+				title={t("continue")}
 				color="green"
 				disabled={playerNames.includes("") || new Set(playerNames).size !== playerNames.length}
 				onPress={() => {
