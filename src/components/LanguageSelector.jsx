@@ -1,8 +1,25 @@
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Button, Dimensions, View } from "react-native";
+import { Dimensions, View } from "react-native";
+import DropDownPicker from "react-native-dropdown-picker";
 
 const LanguageSelector = () => {
-	const { t, i18n } = useTranslation();
+	const { i18n } = useTranslation();
+	const [open, setOpen] = useState(false);
+	const [value, setValue] = useState(i18n.language);
+	useEffect(() => {
+		if (value !== "") i18n.changeLanguage(value);
+	}, [value]);
+	const items = [
+		{
+			label: "English",
+			value: "en",
+		},
+		{
+			label: "العربية",
+			value: "ar",
+		},
+	];
 	return (
 		<View
 			style={{
@@ -10,18 +27,20 @@ const LanguageSelector = () => {
 				height: Dimensions.get("screen").height,
 				position: "absolute",
 				justifyContent: "flex-start",
-				alignItems: "flex-end",
 				paddingTop: 40,
 				paddingRight: 10,
 			}}
 		>
-			<Button
-				title={t("changelng")}
-				color="green"
-				onPress={() => {
-					if (i18n.language === "en") i18n.changeLanguage("ar");
-					else i18n.changeLanguage("en");
+			<DropDownPicker
+				open={open}
+				value={value}
+				items={items}
+				setValue={setValue}
+				setOpen={setOpen}
+				style={{
+					width: 110,
 				}}
+				containerStyle={{ width: 110, marginLeft: Dimensions.get("screen").width - 120 }}
 			/>
 		</View>
 	);

@@ -6,11 +6,14 @@ import RoundCard from "../components/RoundCard";
 import { setScores, setIndex, setEdit, setRounds, setRoundPhase } from "../actions/actionCreators";
 import { AdMobInterstitial } from "expo-ads-admob";
 import { useTranslation } from "react-i18next";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
 const screenWidth = Dimensions.get("window").width;
 const ScorePage = ({
 	playerNames,
 	playerScores,
 	rounds,
+	roundPhase,
 	setScores,
 	isEdit,
 	setIndex,
@@ -49,6 +52,12 @@ const ScorePage = ({
 		setupInterstatialAd();
 	}, []);
 	useEffect(() => {
+		const saveToStorage = async () => {
+			await AsyncStorage.setItem(
+				"currentMatch",
+				JSON.stringify({ rounds, playerNames, playerScores, roundPhase })
+			);
+		};
 		const obj = {};
 		playerNames.forEach((player) => {
 			obj[player] = 0;
@@ -73,8 +82,9 @@ const ScorePage = ({
 		) {
 			showInterstatialAd();
 		}
+		saveToStorage();
 	}, [rounds]);
-	const resetGame = () => {
+	const resetGame = async () => {
 		navigate("/name");
 		setRounds([]);
 		const obj = {};
@@ -84,6 +94,14 @@ const ScorePage = ({
 		setScores(obj);
 		setRoundPhase(null);
 		setIndex(null);
+		if (gameOver) {
+			const match = JSON.parse(await AsyncStorage.getItem("currentMatch"));
+			match.timeFinished = new Date();
+			const matchHistory = JSON.parse((await AsyncStorage.getItem("history")) || "[]");
+			matchHistory.unshift(match);
+			await AsyncStorage.setItem("history", JSON.stringify(matchHistory));
+		}
+		await AsyncStorage.removeItem("currentMatch");
 	};
 	return (
 		<>
@@ -163,7 +181,8 @@ const ScorePage = ({
 											fontSize: 20,
 											paddingVertical: 5,
 											paddingHorizontal: 10,
-											color: "#ccc",
+											color: "#fff",
+											zIndex: 10,
 										}}
 									>
 										{t("edit")}
@@ -192,7 +211,7 @@ const ScorePage = ({
 						/>
 					) : (
 						<Text>
-							{playerNames[Object.values(playerScores).indexOf(Math.max(...Object.values(playerScores)))]}
+							{playerNames[Object.values(playerScores).indexOf(Math.max(...Object.values(playerScores)))]}{" "}
 							{t("wins")}
 						</Text>
 					)}
@@ -239,6 +258,7 @@ const mapStateToProps = (state) => {
 		playerNames: state.playerNames,
 		playerScores: state.playerScores,
 		rounds: state.rounds,
+		roundPhase: state.roundPhase,
 		isEdit: state.isEdit,
 	};
 };

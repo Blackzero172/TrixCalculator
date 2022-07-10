@@ -129,7 +129,7 @@ const RoundPage = ({
 									{hasPlacement && (
 										<Text>
 											{i18n.language === "en"
-												? `${player.trix?.placement} ${
+												? `${player.trix?.placement}${
 														player.trix?.placement === 1
 															? "st"
 															: player.trix?.placement === 2
@@ -171,7 +171,7 @@ const RoundPage = ({
 					<Button
 						title={t("submit")}
 						disabled={Object.keys(currentRound).length < 4}
-						onPress={() => {
+						onPress={async () => {
 							if (isEdit) {
 								playerNames.forEach((player) => {
 									editRound[player] = { ...editRound[player], ...currentRound[player] };

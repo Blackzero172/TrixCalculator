@@ -16,6 +16,7 @@ import BannerAd from "./src/components/BannerAd";
 import "./i18n";
 import { useTranslation } from "react-i18next";
 import LanguageSelector from "./src/components/LanguageSelector";
+import HistoryPage from "./src/pages/HistoryPage";
 const store = createStore(reducers, devToolsEnhancer());
 export default function App() {
 	return (
@@ -29,6 +30,7 @@ export default function App() {
 							<Route path="/new" exact element={<RoundPage />} />
 							<Route path="/name" exact element={<NamePage />} />
 							<Route path="/score" exact element={<ScorePage />} />
+							<Route path="/history" exact element={<HistoryPage />} />
 						</Routes>
 						<StatusBar style="auto" />
 						<BannerAd />

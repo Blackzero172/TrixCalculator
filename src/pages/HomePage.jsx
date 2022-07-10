@@ -1,18 +1,35 @@
 import { Button, StyleSheet, Text, View } from "react-native";
 import { useNavigate } from "react-router";
 import { useTranslation } from "react-i18next";
+import { setNames, setScores, setRounds, setRoundPhase } from "../actions/actionCreators";
+import { connect } from "react-redux";
+import { useEffect } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const HomePage = () => {
+const HomePage = ({ setNames, setScores, setRounds, setRoundPhase, rounds }) => {
 	const navigate = useNavigate();
 	const { t, i18n } = useTranslation();
+	useEffect(() => {
+		const setupGame = async () => {
+			const savedMatch = JSON.parse(await AsyncStorage.getItem("currentMatch"));
+			if (savedMatch) {
+				setNames(savedMatch.playerNames);
+				setScores(savedMatch.playerScores);
+				setRounds(savedMatch.rounds);
+				setRoundPhase(savedMatch.roundPhase);
+			}
+		};
+		setupGame();
+	}, []);
+
 	return (
 		<View style={styles.buttonContainer}>
 			<Text style={styles.heading}>{t("title")}</Text>
 			<Button
-				title={t("start")}
+				title={rounds.length < 1 ? t("start") : t("continue")}
 				color="green"
 				onPress={() => {
-					navigate("/name");
+					navigate(rounds.length < 1 ? "/name" : "/score");
 				}}
 			/>
 			<Button
@@ -23,11 +40,10 @@ const HomePage = () => {
 				}}
 			/>
 			<Button
-				title={t("changelng")}
+				title={t("history")}
 				color="green"
 				onPress={() => {
-					if (i18n.language === "en") i18n.changeLanguage("ar");
-					else i18n.changeLanguage("en");
+					navigate("/history");
 				}}
 			/>
 		</View>
@@ -45,4 +61,9 @@ const styles = StyleSheet.create({
 		marginBottom: 30,
 	},
 });
-export default HomePage;
+const mapStateToProps = (state) => {
+	return {
+		rounds: state.rounds,
+	};
+};
+export default connect(mapStateToProps, { setNames, setScores, setRounds, setRoundPhase })(HomePage);
