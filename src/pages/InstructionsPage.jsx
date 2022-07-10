@@ -13,7 +13,7 @@ const InstructionsPage = () => {
 				}}
 			>
 				<Button
-					title="Back"
+					title={t("back")}
 					color="#d00"
 					onPress={() => {
 						navigate("/");

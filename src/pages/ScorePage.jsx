@@ -52,12 +52,6 @@ const ScorePage = ({
 		setupInterstatialAd();
 	}, []);
 	useEffect(() => {
-		const saveToStorage = async () => {
-			await AsyncStorage.setItem(
-				"currentMatch",
-				JSON.stringify({ rounds, playerNames, playerScores, roundPhase })
-			);
-		};
 		const obj = {};
 		playerNames.forEach((player) => {
 			obj[player] = 0;
@@ -82,8 +76,16 @@ const ScorePage = ({
 		) {
 			showInterstatialAd();
 		}
-		saveToStorage();
 	}, [rounds]);
+	useEffect(() => {
+		const saveToStorage = async () => {
+			await AsyncStorage.setItem(
+				"currentMatch",
+				JSON.stringify({ rounds, playerNames, playerScores, roundPhase })
+			);
+		};
+		saveToStorage();
+	}, [playerScores]);
 	const resetGame = async () => {
 		navigate("/name");
 		setRounds([]);
@@ -233,7 +235,7 @@ const ScorePage = ({
 							]}
 							key={i * 2}
 						>
-							{playerScores[name] > 0 ? "+" : playerNames[name] < 0 ? "-" : ""}
+							{playerScores[name] > 0 ? "+" : playerScores[name] < 0 ? "-" : ""}
 							{playerScores[name]}
 						</Text>
 					))}
