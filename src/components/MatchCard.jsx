@@ -2,6 +2,7 @@ import { StyleSheet, Text, View, Dimensions, Touchable, TouchableOpacity } from 
 import moment from "moment";
 import { useState } from "react";
 import RoundCard from "./RoundCard";
+import { FontAwesome } from "@expo/vector-icons";
 const screenWidth = Dimensions.get("screen").width;
 const MatchCard = ({ match }) => {
 	console.log(match);
@@ -14,12 +15,22 @@ const MatchCard = ({ match }) => {
 				borderTopWidth: 2,
 				borderBottomWidth: 2,
 				borderColor: "#080",
+				backgroundColor: "#ccc",
 			}}
 			onPress={() => {
 				expand(!isExpanded);
 			}}
 		>
-			<Text>{moment(match.timeFinished).format("DD/MM/YYYY HH:MM A")}</Text>
+			<View style={{ flexDirection: "row", alignItems: "center" }}>
+				<Text>{moment(match.timeFinished).format("DD/MM/YYYY HH:MM A")}</Text>
+
+				<FontAwesome
+					name={isExpanded ? "chevron-down" : "chevron-up"}
+					size={15}
+					color="black"
+					style={{ marginLeft: 20 }}
+				/>
+			</View>
 			<View style={styles.container}>
 				{match.playerNames.map((name) => (
 					<Text style={styles.text}>{name}</Text>

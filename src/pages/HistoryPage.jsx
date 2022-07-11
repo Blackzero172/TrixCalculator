@@ -5,6 +5,7 @@ import { Button, ScrollView, Text, View } from "react-native";
 import MatchCard from "../components/MatchCard";
 import { useNavigate } from "react-router";
 import { useTranslation } from "react-i18next";
+import moment from "moment";
 const HistoryPage = () => {
 	const { t } = useTranslation();
 	const [matches, setMatches] = useState([]);
@@ -13,7 +14,11 @@ const HistoryPage = () => {
 		const getMatches = async () => {
 			const history = JSON.parse(await AsyncStorage.getItem("history"));
 			if (!history) await AsyncStorage.setItem("history", JSON.stringify([]));
-			setMatches(history);
+			else {
+				history.filter((match) => moment(match.timeFinished).diff(moment(), "days") >= 30);
+				setMatches(history);
+				await AsyncStorage.setItem("history", JSON.stringify(history));
+			}
 		};
 		getMatches();
 	}, []);
@@ -21,7 +26,7 @@ const HistoryPage = () => {
 		<>
 			<View
 				style={{
-					padding: 40,
+					paddingTop: 50,
 					alignItems: "center",
 					justifyContent: "flex-end",
 				}}
@@ -33,6 +38,7 @@ const HistoryPage = () => {
 						navigate("/");
 					}}
 				/>
+				<Text>{t("expandMessage")}</Text>
 			</View>
 
 			<ScrollView
@@ -48,7 +54,7 @@ const HistoryPage = () => {
 						))}
 					</>
 				) : (
-					<Text>No matches available</Text>
+					<Text>{t("noMatches")}</Text>
 				)}
 			</ScrollView>
 		</>

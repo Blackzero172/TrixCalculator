@@ -26,5 +26,7 @@
 	"doubleAlert": "Was this card marked(2x Points)?",
 	"normal": "Normal",
 	"double": "Double",
-	"markAlert": "Who marked it?"
+	"markAlert": "Who marked it?",
+	"expandMessage": "Press on a match to expand it",
+	"noMatches": "No matches found"
 }
