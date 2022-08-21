@@ -1,8 +1,10 @@
+import { useTranslation } from "react-i18next";
 import { Button, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useNavigate } from "react-router";
 
 const InstructionsPage = () => {
 	const navigate = useNavigate();
+	const { t } = useTranslation();
 	return (
 		<>
 			<View

@@ -1,4 +1,4 @@
-import { Alert, Button, Dimensions, StyleSheet, Text, View, Image, TouchableHighlight } from "react-native";
+import { Button, Dimensions, StyleSheet, Text, View, Image, TouchableHighlight } from "react-native";
 import CustomInput from "../components/CustomInput";
 import Popup from "../components/Popup";
 import {
@@ -80,64 +80,92 @@ const ComplexPage = ({
 		? !lastRoundPlayer.hasOwnProperty("trix") ||
 		  (lastRoundPlayer.hasOwnProperty("complex") && lastRoundPlayer.hasOwnProperty("trix"))
 		: editRoundPlayer.hasOwnProperty("complex") && editRoundPlayer.hasOwnProperty("trix");
-	useEffect(() => {
-		const resetComplex = () => {
-			if (!isEdit)
-				if (newRoundCondition) setRoundPhase("Trix");
-				else setRoundPhase(null);
-			setCurrentRound({});
-			setMaxCards(maxInitalState);
-		};
-		if (maxCards.takes >= 13) {
-			let currentRoundCopy = { ...currentRound };
+	const resetComplex = () => {
+		if (!isEdit)
+			if (newRoundCondition) setRoundPhase("Trix");
+			else setRoundPhase(null);
+		setCurrentRound({});
+		setMaxCards(maxInitalState);
+	};
+	const submitRound = () => {
+		let currentRoundCopy = { ...currentRound };
+		playerNames.forEach((player) => {
+			if (!currentRound[player]?.hasOwnProperty("complex"))
+				currentRoundCopy = {
+					...currentRoundCopy,
+					[player]: {
+						...currentRoundCopy[player],
+						complex: { ...initalState, score: 0 + (rewardArray[player] || 0) },
+					},
+				};
+			else
+				currentRoundCopy = {
+					...currentRoundCopy,
+					[player]: {
+						...currentRoundCopy[player],
+						complex: {
+							...currentRoundCopy[player].complex,
+							score: currentRoundCopy[player].complex.score + (rewardArray[player] || 0),
+						},
+					},
+				};
+		});
+		if (isEdit) {
 			playerNames.forEach((player) => {
-				if (!currentRound[player]?.hasOwnProperty("complex"))
-					currentRoundCopy = {
-						...currentRoundCopy,
-						[player]: {
-							...currentRoundCopy[player],
-							complex: { ...initalState, score: 0 + (rewardArray[player] || 0) },
-						},
-					};
-				else
-					currentRoundCopy = {
-						...currentRoundCopy,
-						[player]: {
-							...currentRoundCopy[player],
-							complex: {
-								...currentRoundCopy[player].complex,
-								score: currentRoundCopy[player].complex.score + (rewardArray[player] || 0),
-							},
-						},
-					};
+				editRound[player] = { ...editRound[player], ...currentRoundCopy[player] };
 			});
-			if (isEdit) {
-				playerNames.forEach((player) => {
-					editRound[player] = { ...editRound[player], ...currentRoundCopy[player] };
-				});
-				setRounds([...rounds.slice(0, roundIndex), editRound, ...rounds.slice(roundIndex + 1)]);
+			setRounds([...rounds.slice(0, roundIndex), editRound, ...rounds.slice(roundIndex + 1)]);
 
-				setRoundPhase(
-					lastRoundPlayer.hasOwnProperty("complex")
-						? "Trix"
-						: lastRoundPlayer.hasOwnProperty("trix")
-						? "Complex"
-						: null
-				);
-				setEdit(false);
-			} else {
-				if (newRoundCondition) setRounds([...rounds, currentRoundCopy]);
-				else {
-					playerNames.forEach((player) => {
-						lastRound[player] = { ...lastRound[player], ...currentRoundCopy[player] };
-					});
-					setRounds([...rounds.slice(0, rounds.length - 1), lastRound]);
-				}
+			setRoundPhase(
+				lastRoundPlayer.hasOwnProperty("complex")
+					? "Trix"
+					: lastRoundPlayer.hasOwnProperty("trix")
+					? "Complex"
+					: null
+			);
+			setEdit(false);
+		} else {
+			if (newRoundCondition) setRounds([...rounds, currentRoundCopy]);
+			else {
+				playerNames.forEach((player) => {
+					lastRound[player] = { ...lastRound[player], ...currentRoundCopy[player] };
+				});
+				setRounds([...rounds.slice(0, rounds.length - 1), lastRound]);
 			}
-			resetComplex();
-			navigate("/score");
 		}
-	}, [maxCards, currentRound]);
+		resetComplex();
+		navigate("/score");
+	};
+	useEffect(() => {
+		let doneEditing = false;
+		if (isEdit) {
+			let currentTakes = 0;
+			Object.keys(currentRound).forEach((player) => {
+				currentTakes += +currentRound[player].complex.takes;
+			});
+			doneEditing = currentTakes >= 13;
+		}
+		if ((maxCards.takes >= 13 && !isEdit) || (isEdit && doneEditing)) {
+			submitRound();
+		}
+	}, [maxCards]);
+	useEffect(() => {
+		if (isEdit) {
+			const editCards = { ...maxInitalState };
+			playerNames.forEach((player) => {
+				Object.keys(editCards).forEach((card) => {
+					if (typeof editCards[card] !== "boolean")
+						editCards[card] = +editCards[card] + +editRound[player].complex[card];
+					else {
+						editCards[card] = editRound[player].complex[card]
+							? editRound[player].complex[card]
+							: editCards[card];
+					}
+				});
+			});
+			setMaxCards(editCards);
+		}
+	}, []);
 	return (
 		<View style={{ alignItems: "center" }}>
 			{selectedPlayer === "" ? (
@@ -149,12 +177,27 @@ const ComplexPage = ({
 								color="green"
 								onPress={() => {
 									selectPlayer(name);
+									if (isEdit) {
+										setCurrentCards(editRound[name]?.complex);
+										const editCards = { ...maxInitalState };
+										Object.keys(editCards).forEach((card) => {
+											if (typeof editCards[card] !== "boolean")
+												editCards[card] = maxCards[card] - +editRound[name].complex[card];
+											else {
+												editCards[card] = editRound[name].complex[card]
+													? !editRound[name].complex[card]
+													: maxCards[card];
+											}
+										});
+										setMaxCards(editCards);
+									}
 								}}
 								key={i}
 								disabled={currentRound[name]?.complex.takes !== undefined}
 							/>
 						))}
 					</View>
+
 					<View style={{ marginTop: 20 }}>
 						<Button
 							title={t("back")}
@@ -175,7 +218,6 @@ const ComplexPage = ({
 									navigate("/score");
 								}
 								setCurrentRound({});
-
 								setMaxCards(maxInitalState);
 							}}
 						/>
@@ -239,6 +281,17 @@ const ComplexPage = ({
 							title={t("back")}
 							onPress={() => {
 								setCurrentCards(initalState);
+								const editCards = { ...maxInitalState };
+								Object.keys(editCards).forEach((card) => {
+									if (typeof editCards[card] !== "boolean")
+										editCards[card] = +editCards[card] + +editRound[selectedPlayer].complex[card];
+									else {
+										editCards[card] = editRound[selectedPlayer].complex[card]
+											? editRound[selectedPlayer].complex[card]
+											: editCards[card];
+									}
+								});
+
 								selectPlayer("");
 							}}
 							color="#d00"
@@ -280,7 +333,7 @@ const ComplexPage = ({
 								setPopup(true);
 							}}
 							underlayColor="#0805"
-							disabled={maxCards.king}
+							disabled={isEdit ? maxCards.king && !currentCards.king : maxCards.king}
 						>
 							<>
 								{maxCards.king && (

@@ -3,7 +3,14 @@ import { StyleSheet, Text, View, Dimensions, Button, TouchableHighlight, Alert }
 import { useNavigate } from "react-router";
 import { connect } from "react-redux";
 import RoundCard from "../components/RoundCard";
-import { setScores, setIndex, setEdit, setRounds, setRoundPhase } from "../actions/actionCreators";
+import {
+	setScores,
+	setIndex,
+	setEdit,
+	setRounds,
+	setRoundPhase,
+	selectPlayer,
+} from "../actions/actionCreators";
 import { AdMobInterstitial } from "expo-ads-admob";
 import { useTranslation } from "react-i18next";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -20,6 +27,7 @@ const ScorePage = ({
 	setEdit,
 	setRounds,
 	setRoundPhase,
+	selectPlayer,
 }) => {
 	const { t } = useTranslation();
 	const setupInterstatialAd = async () => {
@@ -96,6 +104,8 @@ const ScorePage = ({
 		setScores(obj);
 		setRoundPhase(null);
 		setIndex(null);
+		selectPlayer("");
+		setEdit(false);
 		if (gameOver) {
 			const match = JSON.parse(await AsyncStorage.getItem("currentMatch"));
 			match.timeFinished = new Date();
@@ -235,7 +245,7 @@ const ScorePage = ({
 							]}
 							key={i * 2}
 						>
-							{playerScores[name] > 0 ? "+" : playerScores[name] < 0 ? "-" : ""}
+							{playerScores[name] > 0 ? "+" : ""}
 							{playerScores[name]}
 						</Text>
 					))}
@@ -264,6 +274,11 @@ const mapStateToProps = (state) => {
 		isEdit: state.isEdit,
 	};
 };
-export default connect(mapStateToProps, { setScores, setIndex, setEdit, setRounds, setRoundPhase })(
-	ScorePage
-);
+export default connect(mapStateToProps, {
+	setScores,
+	setIndex,
+	setEdit,
+	setRounds,
+	setRoundPhase,
+	selectPlayer,
+})(ScorePage);
