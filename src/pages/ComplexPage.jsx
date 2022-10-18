@@ -117,9 +117,9 @@ const ComplexPage = ({
 			setRounds([...rounds.slice(0, roundIndex), editRound, ...rounds.slice(roundIndex + 1)]);
 
 			setRoundPhase(
-				lastRoundPlayer.hasOwnProperty("complex")
+				lastRoundPlayer.hasOwnProperty("complex") && !lastRoundPlayer.hasOwnProperty("trix")
 					? "Trix"
-					: lastRoundPlayer.hasOwnProperty("trix")
+					: lastRoundPlayer.hasOwnProperty("trix") && !lastRoundPlayer.hasOwnProperty("complex")
 					? "Complex"
 					: null
 			);

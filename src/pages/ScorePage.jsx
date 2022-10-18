@@ -167,6 +167,15 @@ const ScorePage = ({
 						{isEdit && (
 							<TouchableHighlight
 								onPress={() => {
+									const roundPhase =
+										round[playerNames[0]].hasOwnProperty("complex") &&
+										!round[playerNames[0]].hasOwnProperty("trix")
+											? "Complex"
+											: round[playerNames[0]].hasOwnProperty("trix") &&
+											  !round[playerNames[0]].hasOwnProperty("complex")
+											? "Trix"
+											: null;
+									setRoundPhase(roundPhase);
 									setIndex(rounds.indexOf(round));
 									navigate("/new");
 								}}
