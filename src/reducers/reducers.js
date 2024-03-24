@@ -1,4 +1,18 @@
 import { combineReducers } from "redux";
+export const currentCardsInitialState = {
+	takes: 0,
+	king: false,
+	kingDouble: [false, ""],
+	diamonds: 0,
+	qDiamonds: false,
+	qHearts: false,
+	qSpades: false,
+	qClubs: false,
+	qDiamondsDouble: [false, ""],
+	qHeartsDouble: [false, ""],
+	qSpadesDouble: [false, ""],
+	qClubsDouble: [false, ""],
+};
 const playerNamesReducer = (playerNames = ["Ali", "Ahmad", "Saed", "Ibrahem"], action) => {
 	if (action.type === "NAME_PLAYERS") return action.payload;
 	return playerNames;
@@ -38,23 +52,7 @@ const maxCardsReducer = (
 	if (action.type === "ADD_MAX_CARDS") return action.payload;
 	return maxCards;
 };
-const currentCardsReducer = (
-	currentCards = {
-		takes: 0,
-		king: false,
-		kingDouble: false,
-		diamonds: 0,
-		qDiamonds: false,
-		qHearts: false,
-		qSpades: false,
-		qClubs: false,
-		qDiamondsDouble: false,
-		qHeartsDouble: false,
-		qSpadesDouble: false,
-		qClubsDouble: false,
-	},
-	action
-) => {
+const currentCardsReducer = (currentCards = currentCardsInitialState, action) => {
 	if (action.type === "ADD_CURRENT_CARDS") return action.payload;
 	return currentCards;
 };

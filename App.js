@@ -11,13 +11,18 @@ import HomePage from "./src/pages/HomePage";
 import InstructionsPage from "./src/pages/InstructionsPage";
 import RoundPage from "./src/pages/RoundPage";
 import reducers from "./src/reducers/reducers";
-import { devToolsEnhancer } from "redux-devtools-extension";
-import BannerAd from "./src/components/BannerAd";
 import "./i18n";
 import { useTranslation } from "react-i18next";
 import LanguageSelector from "./src/components/LanguageSelector";
 import HistoryPage from "./src/pages/HistoryPage";
-const store = createStore(reducers, devToolsEnhancer());
+import { composeWithDevTools } from "remote-redux-devtools";
+const enhance = composeWithDevTools({
+	realtime: true,
+	host: "localhost",
+	port: 8000,
+});
+
+const store = createStore(reducers, enhance());
 export default function App() {
 	return (
 		<Provider store={store}>
@@ -33,7 +38,6 @@ export default function App() {
 							<Route path="/history" exact element={<HistoryPage />} />
 						</Routes>
 						<StatusBar style="auto" />
-						<BannerAd />
 						<LanguageSelector />
 					</NativeRouter>
 				</SafeAreaView>

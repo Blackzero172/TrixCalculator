@@ -10,10 +10,11 @@ import {
 	setRounds,
 	setRoundPhase,
 	selectPlayer,
+	setCurrentCards,
 } from "../actions/actionCreators";
-import { AdMobInterstitial } from "expo-ads-admob";
 import { useTranslation } from "react-i18next";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { currentCardsInitialState } from "../reducers/reducers";
 
 const screenWidth = Dimensions.get("window").width;
 const ScorePage = ({
@@ -30,20 +31,6 @@ const ScorePage = ({
 	selectPlayer,
 }) => {
 	const { t } = useTranslation();
-	const setupInterstatialAd = async () => {
-		AdMobInterstitial.setAdUnitID("ca-app-pub-3940256099942544/1033173712");
-		AdMobInterstitial.addEventListener("interstitialDidClose", () => {
-			AdMobInterstitial.dismissAdAsync();
-		});
-		try {
-			await AdMobInterstitial.requestAdAsync();
-		} catch (e) {}
-	};
-	const showInterstatialAd = async () => {
-		try {
-			await AdMobInterstitial.showAdAsync();
-		} catch (e) {}
-	};
 	const navigate = useNavigate();
 	const lastRound = rounds[rounds.length - 1] || {};
 	const gameOver =
@@ -57,7 +44,6 @@ const ScorePage = ({
 			obj[player] = 0;
 		});
 		setScores(obj);
-		setupInterstatialAd();
 	}, []);
 	useEffect(() => {
 		const obj = {};
@@ -77,13 +63,6 @@ const ScorePage = ({
 			}
 			setScores(obj);
 		});
-		if (
-			rounds.length >= 0 &&
-			lastRound[Object.keys(lastRound)[0]]?.hasOwnProperty("complex") &&
-			lastRound[Object.keys(lastRound)[0]]?.hasOwnProperty("trix")
-		) {
-			showInterstatialAd();
-		}
 	}, [rounds]);
 	useEffect(() => {
 		const saveToStorage = async () => {
@@ -97,6 +76,7 @@ const ScorePage = ({
 	const resetGame = async () => {
 		navigate("/name");
 		setRounds([]);
+		setCurrentCards(currentCardsInitialState);
 		const obj = {};
 		playerNames.forEach((player) => {
 			obj[player] = 0;

@@ -11,27 +11,14 @@ import {
 	setIndex,
 	setEdit,
 } from "../actions/actionCreators";
+import { currentCardsInitialState } from "../reducers/reducers";
 import { connect } from "react-redux";
 import { useEffect } from "react";
 import { useNavigate } from "react-router";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
-const initalState = {
-	takes: 0,
-	king: false,
-	kingDouble: false,
-	diamonds: 0,
-	qDiamonds: false,
-	qHearts: false,
-	qSpades: false,
-	qClubs: false,
-	qDiamondsDouble: false,
-	qHeartsDouble: false,
-	qSpadesDouble: false,
-	qClubsDouble: false,
-};
 
-const maxInitalState = {
+const maxInitialState = {
 	takes: 0,
 	king: false,
 	diamonds: 0,
@@ -62,7 +49,6 @@ const ComplexPage = ({
 	const { t } = useTranslation();
 	const [popupOpen, setPopup] = useState(false);
 	const [selectedCard, setCard] = useState("");
-	const [rewardArray, setReward] = useState({});
 	let lastRound = rounds[rounds.length - 1] || {};
 	let lastRoundPlayer = lastRound[Object.keys(lastRound)[0]] || {};
 	let editRound = rounds[roundIndex] || {};
@@ -85,20 +71,38 @@ const ComplexPage = ({
 			if (newRoundCondition) setRoundPhase("Trix");
 			else setRoundPhase(null);
 		setCurrentRound({});
-		setMaxCards(maxInitalState);
+		setMaxCards(maxInitialState);
 	};
 	const submitRound = () => {
 		let currentRoundCopy = { ...currentRound };
+		let rewardArray = {};
+		playerNames.forEach((player) => {
+			if (currentRound[player]?.hasOwnProperty("complex")) {
+				Object.keys(currentRoundCopy[player].complex)
+					.filter((key) => key.includes("Double"))
+					.forEach((key) => {
+						if (currentRoundCopy[player].complex[key][1] !== "") {
+							const playerDouble = currentRoundCopy[player].complex[key][1];
+							const playerScore = rewardArray[playerDouble] || 0;
+							if (playerDouble !== "Self")
+								rewardArray = {
+									...rewardArray,
+									[playerDouble]: playerScore + key.includes("king") ? 75 : 25,
+								};
+						}
+					});
+			}
+		});
 		playerNames.forEach((player) => {
 			if (!currentRound[player]?.hasOwnProperty("complex"))
 				currentRoundCopy = {
 					...currentRoundCopy,
 					[player]: {
 						...currentRoundCopy[player],
-						complex: { ...initalState, score: 0 + (rewardArray[player] || 0) },
+						complex: { ...currentCardsInitialState, score: 0 + (rewardArray[player] || 0) },
 					},
 				};
-			else
+			else {
 				currentRoundCopy = {
 					...currentRoundCopy,
 					[player]: {
@@ -109,6 +113,7 @@ const ComplexPage = ({
 						},
 					},
 				};
+			}
 		});
 		if (isEdit) {
 			playerNames.forEach((player) => {
@@ -151,7 +156,7 @@ const ComplexPage = ({
 	}, [maxCards]);
 	useEffect(() => {
 		if (isEdit) {
-			const editCards = { ...maxInitalState };
+			const editCards = { ...maxInitialState };
 			playerNames.forEach((player) => {
 				Object.keys(editCards).forEach((card) => {
 					if (typeof editCards[card] !== "boolean")
@@ -179,7 +184,7 @@ const ComplexPage = ({
 									selectPlayer(name);
 									if (isEdit) {
 										setCurrentCards(editRound[name]?.complex);
-										const editCards = { ...maxInitalState };
+										const editCards = { ...maxInitialState };
 										Object.keys(editCards).forEach((card) => {
 											if (typeof editCards[card] !== "boolean")
 												editCards[card] = maxCards[card] - +editRound[name].complex[card];
@@ -218,7 +223,7 @@ const ComplexPage = ({
 									navigate("/score");
 								}
 								setCurrentRound({});
-								setMaxCards(maxInitalState);
+								setMaxCards(maxInitialState);
 							}}
 						/>
 					</View>
@@ -249,14 +254,14 @@ const ComplexPage = ({
 									[selectedPlayer]: {
 										...currentRound[selectedPlayer],
 										complex: {
-											...initalState,
+											...currentCardsInitialState,
 
 											score: 0,
 										},
 									},
 								});
 								selectPlayer("");
-								setCurrentCards(initalState);
+								setCurrentCards(currentCardsInitialState);
 							} else {
 								setCurrentRound({
 									...currentRound,
@@ -267,7 +272,7 @@ const ComplexPage = ({
 													takes: currentCards.takes,
 											  }
 											: {
-													...initalState,
+													...currentCardsInitialState,
 													takes: currentCards.takes,
 											  },
 									},
@@ -280,13 +285,13 @@ const ComplexPage = ({
 						<Button
 							title={t("back")}
 							onPress={() => {
-								setCurrentCards(initalState);
-								const editCards = { ...maxInitalState };
+								setCurrentCards(currentCardsInitialState);
+								const editCards = { ...maxInitialState };
 								Object.keys(editCards).forEach((card) => {
 									if (typeof editCards[card] !== "boolean")
-										editCards[card] = +editCards[card] + +editRound[selectedPlayer].complex[card];
+										editCards[card] = +editCards[card] + +editRound[selectedPlayer]?.complex[card];
 									else {
-										editCards[card] = editRound[selectedPlayer].complex[card]
+										editCards[card] = editRound[selectedPlayer]?.complex[card]
 											? editRound[selectedPlayer].complex[card]
 											: editCards[card];
 									}
@@ -320,15 +325,15 @@ const ComplexPage = ({
 								styles.cardBtn,
 								{
 									backgroundColor:
-										currentCards.king && !currentCards.kingDouble
+										currentCards.king && !currentCards.kingDouble[0]
 											? "#0f05"
-											: currentCards.kingDouble
+											: currentCards.kingDouble[0]
 											? "#fd7e"
 											: "transparent",
 								},
 							]}
 							onPress={() => {
-								setCurrentCards({ ...currentCards, king: false, kingDouble: false });
+								setCurrentCards({ ...currentCards, king: false, kingDouble: [false, ""] });
 								setCard("king");
 								setPopup(true);
 							}}
@@ -357,15 +362,15 @@ const ComplexPage = ({
 								styles.cardBtn,
 								{
 									backgroundColor:
-										currentCards.qHearts && !currentCards.qHeartsDouble
+										currentCards.qHearts && !currentCards.qHeartsDouble[0]
 											? "#0f05"
-											: currentCards.qHeartsDouble
+											: currentCards.qHeartsDouble[0]
 											? "#fd7e"
 											: "transparent",
 								},
 							]}
 							onPress={() => {
-								setCurrentCards({ ...currentCards, qHearts: false, qHeartsDouble: false });
+								setCurrentCards({ ...currentCards, qHearts: false, qHeartsDouble: [false, ""] });
 								setCard("qHearts");
 								setPopup(true);
 							}}
@@ -394,15 +399,15 @@ const ComplexPage = ({
 								styles.cardBtn,
 								{
 									backgroundColor:
-										currentCards.qDiamonds && !currentCards.qDiamondsDouble
+										currentCards.qDiamonds && !currentCards.qDiamondsDouble[0]
 											? "#0f05"
-											: currentCards.qDiamondsDouble
+											: currentCards.qDiamondsDouble[0]
 											? "#fd7e"
 											: "transparent",
 								},
 							]}
 							onPress={() => {
-								setCurrentCards({ ...currentCards, qDiamonds: false, qDiamondsDouble: false });
+								setCurrentCards({ ...currentCards, qDiamonds: false, qDiamondsDouble: [false, ""] });
 								setCard("qDiamonds");
 								setPopup(true);
 							}}
@@ -431,15 +436,15 @@ const ComplexPage = ({
 								styles.cardBtn,
 								{
 									backgroundColor:
-										currentCards.qSpades && !currentCards.qSpadesDouble
+										currentCards.qSpades && !currentCards.qSpadesDouble[0]
 											? "#0f05"
-											: currentCards.qSpadesDouble
+											: currentCards.qSpadesDouble[0]
 											? "#fd7e"
 											: "transparent",
 								},
 							]}
 							onPress={() => {
-								setCurrentCards({ ...currentCards, qSpades: false, qSpadesDouble: false });
+								setCurrentCards({ ...currentCards, qSpades: false, qSpadesDouble: [false, ""] });
 								setCard("qSpades");
 								setPopup(true);
 							}}
@@ -468,15 +473,15 @@ const ComplexPage = ({
 								styles.cardBtn,
 								{
 									backgroundColor:
-										currentCards.qClubs && !currentCards.qClubsDouble
+										currentCards.qClubs && !currentCards.qClubsDouble[0]
 											? "#0f05"
-											: currentCards.qClubsDouble
+											: currentCards.qClubsDouble[0]
 											? "#fd7e"
 											: "transparent",
 								},
 							]}
 							onPress={() => {
-								setCurrentCards({ ...currentCards, qClubs: false, qClubsDouble: false });
+								setCurrentCards({ ...currentCards, qClubs: false, qClubsDouble: [false, ""] });
 								setCard("qClubs");
 								setPopup(true);
 							}}
@@ -515,16 +520,16 @@ const ComplexPage = ({
 											score:
 												currentCards.takes * -15 +
 												currentCards.diamonds * -10 +
-												(currentCards.king + currentCards.kingDouble) * -75 +
+												(currentCards.king + currentCards.kingDouble[0]) * -75 +
 												(currentCards.qClubs +
 													currentCards.qDiamonds +
 													currentCards.qHearts +
 													currentCards.qSpades) *
 													-25 +
-												(currentCards.qClubsDouble +
-													currentCards.qDiamondsDouble +
-													currentCards.qHeartsDouble +
-													currentCards.qSpadesDouble) *
+												(currentCards.qClubsDouble[0] +
+													currentCards.qDiamondsDouble[0] +
+													currentCards.qHeartsDouble[0] +
+													currentCards.qSpadesDouble[0]) *
 													-25,
 										},
 									},
@@ -539,7 +544,7 @@ const ComplexPage = ({
 									diamonds: +maxCards.diamonds + +currentCards.diamonds,
 									takes: +maxCards.takes + +currentCards.takes,
 								});
-								setCurrentCards(initalState);
+								setCurrentCards(currentCardsInitialState);
 								selectPlayer("");
 							}}
 						/>
@@ -573,6 +578,7 @@ const ComplexPage = ({
 								{
 									text: t("normal"),
 									onPress: () => {
+										setCard("");
 										setCurrentCards({ ...currentCards, [selectedCard]: true });
 										setPopup(false);
 									},
@@ -584,7 +590,7 @@ const ComplexPage = ({
 										setCurrentCards({
 											...currentCards,
 											[selectedCard]: true,
-											[`${selectedCard}Double`]: true,
+											[`${selectedCard}Double`]: [true, ""],
 										});
 									},
 									color: "#db5",
@@ -594,13 +600,14 @@ const ComplexPage = ({
 				}
 				onClose={() => {
 					setPopup(false);
-					setCurrentCards({ ...currentCards, [selectedCard]: false, [`${selectedCard}Double`]: false });
+					setCard("");
+					setCurrentCards({ ...currentCards, [selectedCard]: false, [`${selectedCard}Double`]: [false, ""] });
 				}}
 			>
-				{!currentCards[selectedCard] && !currentCards[`${selectedCard}Double`] && (
+				{!currentCards[selectedCard] && selectedCard !== "" && (
 					<Text style={{ marginBottom: 20 }}>{t("doubleAlert")}</Text>
 				)}
-				{currentCards[`${selectedCard}Double`] && (
+				{currentCards[selectedCard] && (
 					<>
 						<Text>{t("markAlert")}</Text>
 						<View style={{ flexDirection: "row", marginTop: 10 }}>
@@ -614,18 +621,8 @@ const ComplexPage = ({
 										title={player}
 										color="green"
 										onPress={() => {
-											if (player !== "Self")
-												setReward({
-													...rewardArray,
-													[player]:
-														(currentCards.qClubsDouble +
-															currentCards.qHeartsDouble +
-															currentCards.qDiamondsDouble +
-															currentCards.qSpadesDouble) *
-															25 +
-														currentCards.kingDouble * 75,
-												});
-
+											setCard("");
+											setCurrentCards({ ...currentCards, [`${selectedCard}Double`]: [true, player] });
 											setPopup(false);
 										}}
 									/>

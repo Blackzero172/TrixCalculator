@@ -1,11 +1,10 @@
-import { StyleSheet, Text, View, Dimensions, Touchable, TouchableOpacity } from "react-native";
+import { StyleSheet, Text, View, Dimensions, Touchable, TouchableOpacity, Button } from "react-native";
 import moment from "moment";
 import { useState } from "react";
 import RoundCard from "./RoundCard";
 import { FontAwesome } from "@expo/vector-icons";
 const screenWidth = Dimensions.get("screen").width;
 const MatchCard = ({ match }) => {
-	console.log(match);
 	const [isExpanded, expand] = useState(false);
 	return (
 		<TouchableOpacity
@@ -54,11 +53,16 @@ const MatchCard = ({ match }) => {
 							},
 						]}
 					>
-						{match.playerScores[name] > 0 ? "+" : match.playerScores[name] < 0 ? "-" : ""}
+						{match.playerScores[name] > 0 ? "+" : ""}
 						{match.playerScores[name]}
 					</Text>
 				))}
 			</View>
+			{isExpanded && (
+				<View style={{ margin: 10 }}>
+					<Button title="Details" onPress={() => {}} />
+				</View>
+			)}
 		</TouchableOpacity>
 	);
 };
